@@ -370,8 +370,10 @@ describe('Admin Concepts/Labels API', () => {
       // search endpoint call and suggestion dropdown target.
       expect(res.text).toMatch(/\/concepts\/search\?exclude=/);
       expect(res.text).toContain('id="suggest-broader"');
-      expect(res.text).toContain('id="suggest-narrower"');
       expect(res.text).toContain('id="suggest-related"');
+      // "Mais específico (NT)" é relação derivada e somente-leitura — não tem
+      // formulário de adição, logo não tem campo de busca próprio.
+      expect(res.text).not.toContain('id="suggest-narrower"');
     });
   });
 
@@ -477,6 +479,7 @@ describe('Admin Concepts/Labels API', () => {
       const res = await request(app)
         .post(`/concepts/${concept.id}/activate`)
         .set('Authorization', validAuth)
+        .set('Accept', 'application/json')
         .send({ version: 1 });
 
       expect(res.status).toBe(200);
