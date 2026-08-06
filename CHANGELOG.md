@@ -13,6 +13,25 @@ ADR-007 F3).
 
 ---
 
+## 2026-08-06 — origem: BioCultDB
+
+**Commit**: `cc309f2`
+
+Correção de uma regressão silenciosa na aquisição, encontrada ao preparar a curadoria em massa do
+campo semântico "Tipos de Usos de Plantas" (713 termos) no BioCultDB:
+- `AcquisitionService.upsertConcept` verificava a existência de um termo **apenas** entre os
+  `prefLabels`. Qualquer termo que o curador recolhesse como rótulo alternativo ou oculto de outro
+  conceito era semeado de novo como candidato na execução seguinte do cron (03:00), desfazendo a
+  fusão sem deixar rastro na interface. A verificação passa a cobrir `prefLabels`, `altLabels` e
+  `hiddenLabels`.
+- Idioma dos rótulos semeados: `pt` (ISO 639-1) → `por` (ISO 639-3), que é o que o modelo
+  (`createLabel`), a tela de edição do admin e o `docs/Manual.md` do BioCultDB já documentavam, e o
+  único que codifica as línguas indígenas que este vocabulário existe para abrigar (`tup`, `kgp`).
+  `ConceptService.shortPrefLabel` ajustado; migração idempotente em
+  `backend/scripts/migrate-language-pt-to-por.js` para as linhas já gravadas.
+- Três testes novos em `tests/unit/acquisition-service.test.js` cobrindo a sobrevivência da curadoria
+  ao ciclo de aquisição (verificado: falham com o código anterior).
+
 ## 2026-07-22 — origem: BioCultDB
 
 **Commit**: `3d7d878`
