@@ -166,7 +166,7 @@ maybeDescribe('US1: Automatic term acquisition from BioCultDB', () => {
       status: 'candidate',
       sourceFields: ['comunidades.plantas.nomeVernacular'],
       sourceCommunities: [],
-      prefLabels: [{ literalForm: 'erva-mate', language: 'pt', type: 'pref', accessLevel: 'public' }],
+      prefLabels: [{ literalForm: 'erva-mate', language: 'por', type: 'pref', accessLevel: 'public' }],
     });
     insertConcept(db, existing);
 
@@ -247,7 +247,7 @@ maybeDescribe('US1: Automatic term acquisition from BioCultDB', () => {
     expect(withCommunity.length).toBeGreaterThanOrEqual(1);
   });
 
-  test('all created concepts have status "candidate", prefLabel with language "pt" and accessLevel "public"', async () => {
+  test('all created concepts have status "candidate", prefLabel with language "por" and accessLevel "public"', async () => {
     insertBiocultdbRecord(makeEtnodbDoc());
 
     await AcquisitionService.run(db);
@@ -259,7 +259,7 @@ maybeDescribe('US1: Automatic term acquisition from BioCultDB', () => {
       expect(concept.status).toBe('candidate');
       expect(concept.prefLabels.length).toBeGreaterThan(0);
       for (const label of concept.prefLabels) {
-        expect(label.language).toBe('pt');
+        expect(label.language).toBe('por');
         expect(label.accessLevel).toBe('public');
       }
     }

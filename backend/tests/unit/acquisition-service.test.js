@@ -147,6 +147,98 @@ describe('AcquisitionService — unit tests', () => {
   });
 
   // ---------------------------------------------------------------------------
+  // Curation survival: a term folded into another concept must not be recreated
+  // ---------------------------------------------------------------------------
+
+  describe('curation survival', () => {
+    /** Folds `term` into `targetLiteralForm` as a label of `arrayKey`, the way a
+     *  curator merging duplicates does. */
+    function foldLabelInto(db, targetLiteralForm, arrayKey, term) {
+      const target = findConceptByPrefLabel(db, targetLiteralForm);
+      target[arrayKey].push({
+        id: randomUUID(),
+        literalForm: term,
+        language: 'por',
+        type: arrayKey === 'altLabels' ? 'alt' : 'hidden',
+        accessLevel: 'public',
+        labelRelations: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+      db.prepare('UPDATE etnotermos SET doc = ? WHERE id = ?').run(
+        JSON.stringify(target),
+        target.id
+      );
+    }
+
+    test('a term folded in as an altLabel is not recreated as a new concept', async () => {
+      insertBiocultdbRecord(db, {
+        comunidades: [
+          {
+            nome: 'Krenak',
+            tipo: 'Indígena',
+            plantas: [{ nomeVernacular: 'guaco', tipoUso: ['gripe', 'gripes'] }],
+            atividadesEconomicas: [],
+          },
+        ],
+      });
+      await AcquisitionService.run(db);
+      expect(findConceptsByPrefLabel(db, 'gripes')).toHaveLength(1);
+
+      // Curator merges: 'gripes' becomes an alternative label of 'gripe' and the
+      // duplicate concept is removed.
+      const dupe = findConceptByPrefLabel(db, 'gripes');
+      db.prepare('DELETE FROM etnotermos WHERE id = ?').run(dupe.id);
+      foldLabelInto(db, 'gripe', 'altLabels', 'gripes');
+
+      await AcquisitionService.run(db);
+
+      expect(findConceptsByPrefLabel(db, 'gripes')).toHaveLength(0);
+      const gripe = findConceptByPrefLabel(db, 'gripe');
+      expect(gripe.altLabels.map((l) => l.literalForm)).toContain('gripes');
+    });
+
+    test('a misspelling folded in as a hiddenLabel is not recreated as a new concept', async () => {
+      insertBiocultdbRecord(db, {
+        comunidades: [
+          {
+            nome: 'Fulni-ô',
+            tipo: 'Indígena',
+            plantas: [{ nomeVernacular: 'goiaba', tipoUso: ['diarreia', 'diarréia'] }],
+            atividadesEconomicas: [],
+          },
+        ],
+      });
+      await AcquisitionService.run(db);
+
+      const dupe = findConceptByPrefLabel(db, 'diarréia');
+      db.prepare('DELETE FROM etnotermos WHERE id = ?').run(dupe.id);
+      foldLabelInto(db, 'diarreia', 'hiddenLabels', 'diarréia');
+
+      await AcquisitionService.run(db);
+
+      expect(findConceptsByPrefLabel(db, 'diarréia')).toHaveLength(0);
+    });
+
+    test('seeded concepts use the ISO 639-3 language code', async () => {
+      insertBiocultdbRecord(db, {
+        comunidades: [
+          {
+            nome: 'Tekoha',
+            tipo: 'Indígena',
+            plantas: [{ nomeVernacular: 'jaborandi', tipoUso: [] }],
+            atividadesEconomicas: [],
+          },
+        ],
+      });
+
+      await AcquisitionService.run(db);
+
+      expect(findConceptByPrefLabel(db, 'jaborandi').prefLabels[0].language).toBe('por');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Scientific name extraction
   // ---------------------------------------------------------------------------
 

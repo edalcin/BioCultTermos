@@ -98,6 +98,11 @@ function collectFieldValues(db) {
 /**
  * Upserts a single value into the etnotermos concept table.
  * Returns 'created' or 'existing'.
+ *
+ * Existence is checked against pref, alt AND hidden labels. A term that curation
+ * folded into another concept as an alternative or hidden label is already
+ * represented in the vocabulary; matching only prefLabels would recreate it as a
+ * fresh candidate on the next cycle, silently undoing the curator's work.
  */
 function upsertConcept(db, field, normalizedValue, comunidades) {
   const cleanCommunities = comunidades.filter(Boolean);
@@ -106,11 +111,19 @@ function upsertConcept(db, field, normalizedValue, comunidades) {
     .prepare(
       `SELECT doc FROM etnotermos e
        WHERE EXISTS (
-         SELECT 1 FROM json_each(json_extract(e.doc,'$.prefLabels')) je
-         WHERE json_extract(je.value,'$.literalForm') = ? AND json_extract(je.value,'$.type') = 'pref'
+         SELECT 1 FROM json_each(coalesce(json_extract(e.doc,'$.prefLabels'),'[]')) je
+         WHERE json_extract(je.value,'$.literalForm') = :value
+       )
+       OR EXISTS (
+         SELECT 1 FROM json_each(coalesce(json_extract(e.doc,'$.altLabels'),'[]')) je
+         WHERE json_extract(je.value,'$.literalForm') = :value
+       )
+       OR EXISTS (
+         SELECT 1 FROM json_each(coalesce(json_extract(e.doc,'$.hiddenLabels'),'[]')) je
+         WHERE json_extract(je.value,'$.literalForm') = :value
        )`
     )
-    .get(normalizedValue);
+    .get({ value: normalizedValue });
 
   if (!existingRow) {
     const concept = createConcept({
@@ -120,7 +133,7 @@ function upsertConcept(db, field, normalizedValue, comunidades) {
       prefLabels: [
         {
           literalForm: normalizedValue,
-          language: 'pt',
+          language: 'por',
           type: 'pref',
           accessLevel: 'public',
         },

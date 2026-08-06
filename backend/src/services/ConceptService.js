@@ -91,13 +91,13 @@ function stripNonPublicLabels(concept) {
 
 /**
  * Derive a short prefLabel string from a concept document.
- * Prefers the Portuguese prefLabel; falls back to the first available.
+ * Prefers the Portuguese prefLabel (ISO 639-3 `por`); falls back to the first available.
  */
 function shortPrefLabel(concept) {
   if (!concept) return null;
   const labels = concept.prefLabels ?? [];
-  const pt = labels.find((l) => l.language === 'pt');
-  return (pt ?? labels[0])?.literalForm ?? null;
+  const por = labels.find((l) => l.language === 'por');
+  return (por ?? labels[0])?.literalForm ?? null;
 }
 
 /**
