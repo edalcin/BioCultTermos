@@ -145,6 +145,7 @@ describe('Contract: Admin Acquisition & Audit API', () => {
       expect(res.body).toHaveProperty('lastRun', null);
       // Acquisition is on-demand only: there is no scheduled run to advertise.
       expect(res.body).not.toHaveProperty('scheduledNext');
+      expect(res.body).toHaveProperty('running', false);
     });
 
     test('returns lastRun object with required fields after a run exists', async () => {

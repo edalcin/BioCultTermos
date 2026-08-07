@@ -177,7 +177,37 @@ function yieldToEventLoop() {
   return new Promise((resolve) => setImmediate(resolve));
 }
 
+/**
+ * True while a cycle is in flight. Lets the admin interface disable the trigger
+ * and show progress instead of letting a curator fire overlapping cycles.
+ *
+ * Ceiling: a module-level flag is enough because the admin app is a single Node
+ * process and better-sqlite3 is synchronous. A multi-replica deployment would
+ * need a lock row in SQLite instead.
+ */
+let running = false;
+let runningSince = null;
+
+export function isRunning() {
+  return running;
+}
+
+export function runningSinceIso() {
+  return runningSince;
+}
+
 export async function run(db) {
+  // Single-flight. A second concurrent cycle cannot corrupt anything — each
+  // term's check-then-write is atomic and the cycles traverse the same order —
+  // but it redoes the whole scan for nothing and writes a second, confusing log.
+  if (running) {
+    const err = new Error('Aquisição já em execução.');
+    err.code = 409;
+    throw err;
+  }
+  running = true;
+  runningSince = new Date().toISOString();
+
   const startedAt = Date.now();
   const executedAt = new Date().toISOString();
   const fieldsProcessed = [];
@@ -275,6 +305,9 @@ export async function run(db) {
 
     insertAcquisitionLog(db, log);
     return log;
+  } finally {
+    running = false;
+    runningSince = null;
   }
 }
 
@@ -287,4 +320,4 @@ export async function getLastRunStatus(db) {
   return { lastRun: findLastAcquisitionLog(db) || null };
 }
 
-export default { run, getLastRunStatus };
+export default { run, getLastRunStatus, isRunning, runningSinceIso };

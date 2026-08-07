@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import { connect, disconnect, clearCollections, getDb } from '../helpers/db.js';
 import * as AcquisitionService from '../../src/services/AcquisitionService.js';
+import * as ConceptService from '../../src/services/ConceptService.js';
 
 function makeEtnodbDoc(overrides = {}) {
   return {
@@ -423,6 +424,130 @@ describe('AcquisitionService — unit tests', () => {
       const result = await AcquisitionService.getLastRunStatus(db);
       expect(result.lastRun).not.toBeNull();
       expect(result.lastRun).toHaveProperty('status');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Concorrência: curar enquanto uma aquisição roda
+  // ---------------------------------------------------------------------------
+
+  describe('curation running concurrently with an acquisition cycle', () => {
+    test('curation writes neither collide (409) nor get lost while a cycle is in flight', async () => {
+      insertBiocultdbRecord(db, makeEtnodbDoc());
+      await AcquisitionService.run(db);
+
+      const target = findConceptByPrefLabel(db, 'medicinal');
+      expect(target).not.toBeNull();
+      const countBefore = countEtnotermos(db);
+
+      // Cycle in flight, deliberately NOT awaited: run() yields to the event loop
+      // every YIELD_EVERY upserts, so the curation writes below really do interleave
+      // with it instead of queueing behind it.
+      const cycle = AcquisitionService.run(db);
+
+      const fresh = await ConceptService.findById(db, target.id);
+      await ConceptService.addLabel(
+        db,
+        target.id,
+        fresh.version,
+        { literalForm: 'medicinais', type: 'alt', language: 'por', accessLevel: 'public' },
+        'curador-teste'
+      );
+
+      const afterLabel = await ConceptService.findById(db, target.id);
+      await ConceptService.updateNotes(
+        db,
+        target.id,
+        afterLabel.version,
+        { definition: 'Uso terapêutico da planta.' },
+        'curador-teste'
+      );
+
+      await cycle;
+
+      // The acquisition touches only sourceFields/sourceCommunities and never bumps
+      // `version`, so it cannot trip the optimistic lock — and it re-reads the doc
+      // immediately before writing, so it cannot clobber what the curator just wrote.
+      const curated = await ConceptService.findById(db, target.id);
+      expect(curated.altLabels.map((l) => l.literalForm)).toContain('medicinais');
+      expect(curated.definition).toBe('Uso terapêutico da planta.');
+      expect(curated.sourceFields).toContain('comunidades.plantas.tipoUso');
+      expect(countEtnotermos(db)).toBe(countBefore);
+    });
+
+    test('a term absorbed as an alt label is not recreated by a concurrent cycle', async () => {
+      insertBiocultdbRecord(db, makeEtnodbDoc());
+      await AcquisitionService.run(db);
+
+      const keep = findConceptByPrefLabel(db, 'medicinal');
+      const absorbed = findConceptByPrefLabel(db, 'alimentício');
+      expect(absorbed).not.toBeNull();
+
+      // Fold "alimentício" into "medicinal" as an alt label, then deprecate the origin —
+      // the Fase 2 shape of the curation procedure.
+      await ConceptService.addLabel(
+        db,
+        keep.id,
+        keep.version,
+        { literalForm: 'alimentício', type: 'alt', language: 'por', accessLevel: 'public' },
+        'curador-teste'
+      );
+      await ConceptService.deprecate(
+        db,
+        absorbed.id,
+        absorbed.version,
+        { replacedById: keep.id },
+        'curador-teste'
+      );
+
+      const countAfterCuration = countEtnotermos(db);
+      await AcquisitionService.run(db);
+
+      expect(countEtnotermos(db)).toBe(countAfterCuration);
+      expect(findConceptsByPrefLabel(db, 'alimentício')).toHaveLength(1);
+      expect(findConceptByPrefLabel(db, 'alimentício').status).toBe('deprecated');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Execução única (single-flight)
+  // ---------------------------------------------------------------------------
+
+  describe('single-flight guard', () => {
+    test('isRunning() is false at rest and true while a cycle is in flight', async () => {
+      insertBiocultdbRecord(db, makeEtnodbDoc());
+      expect(AcquisitionService.isRunning()).toBe(false);
+
+      const cycle = AcquisitionService.run(db);
+      expect(AcquisitionService.isRunning()).toBe(true);
+      expect(AcquisitionService.runningSinceIso()).not.toBeNull();
+
+      await cycle;
+      expect(AcquisitionService.isRunning()).toBe(false);
+      expect(AcquisitionService.runningSinceIso()).toBeNull();
+    });
+
+    test('a second concurrent run is refused with 409 and writes no extra log', async () => {
+      insertBiocultdbRecord(db, makeEtnodbDoc());
+
+      const cycle = AcquisitionService.run(db);
+      await expect(AcquisitionService.run(db)).rejects.toMatchObject({ code: 409 });
+
+      await cycle;
+      expect(countAcquisitionLogs(db)).toBe(1);
+    });
+
+    test('the guard is released after a failing cycle, so the next click still works', async () => {
+      // Corrupt payload → run() takes the catch branch; the flag must still reset.
+      db.prepare(
+        'INSERT INTO biocultdb_records (id, doc, created_at, updated_at) VALUES (?, ?, ?, ?)'
+      ).run(randomUUID(), JSON.stringify({ comunidades: 'não é um array' }), '2026-01-01', '2026-01-01');
+
+      const log = await AcquisitionService.run(db);
+      expect(log.status).toBe('failure');
+      expect(AcquisitionService.isRunning()).toBe(false);
+
+      await expect(AcquisitionService.run(db)).resolves.toBeDefined();
     });
   });
 });

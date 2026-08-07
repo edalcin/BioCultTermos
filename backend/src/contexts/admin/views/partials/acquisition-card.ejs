@@ -1,0 +1,56 @@
+<%#
+  Cartão de aquisição do dashboard, em dois estados.
+
+  Enquanto um ciclo está no ar, o gatilho fica desabilitado e o cartão se
+  re-consulta a cada 3 s, voltando sozinho ao estado ocioso quando o ciclo
+  termina. Isso existe para o curador saber que há uma varredura em andamento —
+  sem isso o botão aceita cliques repetidos que só refazem os mesmos ~40 s.
+
+  Renderizado inteiro (com o <div id>) para que o htmx possa trocá-lo por si
+  mesmo com hx-swap="outerHTML".
+-%>
+<div id="acq-card" class="bg-white rounded-lg shadow-md p-6 mb-8"
+     <% if (acquisitionRunning) { %>
+     hx-get="/acquisition/card"
+     hx-trigger="every 3s"
+     hx-swap="outerHTML"
+     <% } %>>
+  <h2 class="text-lg font-semibold text-gray-800 mb-3">Aquisição de Termos</h2>
+
+  <% if (acquisitionRunning) { %>
+    <p class="text-gray-600 text-sm mb-4">
+      Varredura em andamento<% if (acquisitionRunningSince) { %>, iniciada às
+      <%= new Date(acquisitionRunningSince).toLocaleTimeString('pt-BR') %><% } %>.
+      Um ciclo completo leva cerca de 40 segundos. Pode continuar curando: as duas
+      coisas não se atropelam.
+    </p>
+
+    <button type="button" disabled aria-busy="true"
+            class="px-5 py-2 bg-gray-300 text-gray-600 rounded-lg font-medium
+                   flex items-center gap-2 cursor-not-allowed">
+      <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+      </svg>
+      Executando…
+    </button>
+  <% } else { %>
+    <p class="text-gray-600 text-sm mb-4">
+      Varre o banco BioCultDB e cria conceitos candidatos para valores de campo ainda não catalogados.
+      Só acontece quando você clica: não há execução agendada.
+    </p>
+
+    <button
+      hx-post="/acquisition/run"
+      hx-target="#acq-card"
+      hx-swap="outerHTML"
+      class="px-5 py-2 bg-forest-600 text-white rounded-lg hover:bg-forest-700
+             transition-colors font-medium flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+      Executar Aquisição
+    </button>
+  <% } %>
+</div>

@@ -33,7 +33,7 @@ router.get('/', async (req, res, next) => {
       page: pageNum,
       totalPages: Math.ceil(total / limitNum) || 1,
       filters: { status: status || '' },
-      acquisitionRunning: false,
+      acquisitionRunning: AcquisitionService.isRunning(),
       user: req.user,
       currentPage: 'acquisition',
     });
@@ -42,13 +42,34 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+/** Renders the acquisition card in whichever state the service is in. */
+function renderCard(res) {
+  return res.render('partials/acquisition-card', {
+    acquisitionRunning: AcquisitionService.isRunning(),
+    acquisitionRunningSince: AcquisitionService.runningSinceIso(),
+  });
+}
+
+router.get('/card', (req, res) => renderCard(res));
+
+router.get('/badge', (req, res) =>
+  res.render('partials/acquisition-badge', { acquisitionRunning: AcquisitionService.isRunning() })
+);
+
 router.post('/run', (req, res) => {
   const db = req.app.locals.db;
+
+  // Refuse a second concurrent cycle. It could not corrupt anything, but it would
+  // redo the same ~40 s scan and leave a second, confusing log entry.
+  if (AcquisitionService.isRunning()) {
+    if (req.headers['hx-request']) return renderCard(res);
+    return res.status(409).json({ error: 'Aquisição já em execução.' });
+  }
+
   AcquisitionService.run(db).catch(() => {});
+
   if (req.headers['hx-request']) {
-    return res.send(
-      '<span class="text-forest-700 font-medium">Aquisição iniciada. Aguarde alguns segundos e recarregue o dashboard para ver o resultado.</span>'
-    );
+    return renderCard(res);
   }
   res.status(202).json({ ok: true, message: 'Aquisição iniciada em background.' });
 });
@@ -57,7 +78,11 @@ router.get('/status', async (req, res, next) => {
   try {
     const db = req.app.locals.db;
     const { lastRun } = await AcquisitionService.getLastRunStatus(db);
-    res.json({ lastRun });
+    res.json({
+      lastRun,
+      running: AcquisitionService.isRunning(),
+      runningSince: AcquisitionService.runningSinceIso(),
+    });
   } catch (err) {
     next(err);
   }

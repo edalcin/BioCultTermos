@@ -1,0 +1,29 @@
+<%#
+  Selo de "aquisição em andamento" da página de logs.
+
+  Enquanto o ciclo está no ar, se re-consulta a cada 3 s. Quando termina, vira um
+  link para recarregar — a lista de logs desta página fica desatualizada no
+  instante em que o ciclo grava a nova entrada, e recarregar é o que mostra o
+  resultado. Sem auto-refresh: quem decide quando recarregar é quem está lendo.
+-%>
+<% if (acquisitionRunning) { %>
+<div id="acq-live"
+     hx-get="/acquisition/badge"
+     hx-trigger="every 3s"
+     hx-swap="outerHTML"
+     class="flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-medium">
+  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+  </svg>
+  Aquisição em andamento…
+</div>
+<% } else { %>
+<a id="acq-live" href="/acquisition"
+   class="flex items-center gap-2 px-4 py-2 bg-forest-100 text-forest-800 rounded-lg text-sm font-medium hover:bg-forest-200 transition-colors">
+  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+  </svg>
+  Aquisição concluída — atualizar a lista
+</a>
+<% } %>
