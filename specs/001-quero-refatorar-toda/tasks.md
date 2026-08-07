@@ -212,11 +212,14 @@
   - Exportar `run()` e `getLastRunStatus()`
   - Depende de: T015, T016, T022
 
-- [X] T024 Implementar `backend/src/lib/scheduler/acquisitionCron.js`
-  - Inicializar `node-cron` com `ACQUISITION_CRON_SCHEDULE`
-  - Chamar `AcquisitionService.run()` no horário agendado
-  - Exportar `start()` e `stop()`
-  - Depende de: T023
+- [X] ~~T024 Implementar `backend/src/lib/scheduler/acquisitionCron.js`~~ — **revertido em 2026-08-07**
+  - O agendamento foi eliminado: módulo removido, dependência `node-cron` retirada,
+    `ACQUISITION_CRON_SCHEDULE` deixou de ser lida e `scheduledNext` saiu de `GET /acquisition/status`.
+  - A aquisição é exclusivamente sob demanda, no botão "Executar Aquisição" do dashboard admin
+    (`POST /acquisition/run`). Ver `docs/decisions/ADR-001` (nota de revogação do item 7) e o D14 de
+    `docs/curadoria-tipos-de-uso-procedimento.md`, no repositório BioCultDB.
+  - **Não reimplementar.** T028 e T032 mencionam este módulo e o campo `scheduledNext`; ambos caducaram
+    com esta reversão.
 
 ---
 

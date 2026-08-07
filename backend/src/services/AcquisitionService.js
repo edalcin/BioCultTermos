@@ -279,13 +279,12 @@ export async function run(db) {
 }
 
 /**
- * Returns the most recent acquisition log and a null scheduledNext placeholder.
- * The caller (route handler) is responsible for computing the next scheduled run
- * from the active cron expression.
+ * Returns the most recent acquisition log.
+ * There is no scheduled run to report: acquisition happens on demand only, when a
+ * curator clicks "Executar Aquisição" on the admin dashboard (POST /acquisition/run).
  */
 export async function getLastRunStatus(db) {
-  const lastRun = findLastAcquisitionLog(db);
-  return { lastRun: lastRun || null, scheduledNext: null };
+  return { lastRun: findLastAcquisitionLog(db) || null };
 }
 
 export default { run, getLastRunStatus };

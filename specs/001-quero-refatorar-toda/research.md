@@ -97,6 +97,13 @@
 **Alternativa considerada**: Agenda (job scheduler dependente de um document store dedicado para persistência dos jobs)
 - Rejeitada: overhead desnecessário; node-cron é suficiente para 1 job simples
 
+> **Revertida em 2026-08-07.** O agendamento foi eliminado por completo: `acquisitionCron.js`
+> removido, dependência `node-cron` retirada e `ACQUISITION_CRON_SCHEDULE` deixou de ser lida. A
+> aquisição passa a ser exclusivamente sob demanda, no botão "Executar Aquisição" do dashboard admin
+> (`POST /acquisition/run`). Motivo: a aquisição sobrescreve o estado do vocabulário, então quem decide
+> quando isso acontece é o curador, não um relógio. O que a Decisão 5 registra como idempotência do
+> `run()` continua valendo — só não há mais nada chamando `run()` sozinho.
+
 ---
 
 ## Decisão 6: Optimistic Locking para edições concorrentes
@@ -187,7 +194,7 @@ frontend/src/styles/input.css          (manter)
 | 2 | Hierarquias | Array of Ancestors pattern |
 | 3 | Auth curadoria | Custom Basic Auth middleware + bcrypt + env vars |
 | 4 | Upload áudio | multer + diskStorage + AUDIO_STORAGE_PATH |
-| 5 | Agendamento | node-cron com AcquisitionService idempotente |
+| 5 | Agendamento | ~~node-cron com AcquisitionService idempotente~~ — **revertido em 2026-08-07**: só sob demanda |
 | 6 | Edições concorrentes | Optimistic locking via campo `version` |
 | 7 | Legado Z39.19 | Remoção completa, sem migração de dados |
 | 8 | Constituição | Atualizar para SKOS-XL pós-feature |

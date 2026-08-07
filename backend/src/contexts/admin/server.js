@@ -6,8 +6,6 @@ import { fileURLToPath } from 'url';
 import { config, validateConfig } from '../../config/index.js';
 import requireAuth from '../../lib/auth/basicAuth.js';
 import { requestLogger } from '../../lib/logger.js';
-import * as cron from '../../lib/scheduler/acquisitionCron.js';
-import * as AcquisitionService from '../../services/AcquisitionService.js';
 import indexRouter from './routes/index.js';
 import conceptsRouter from './routes/concepts.js';
 import labelsRouter from './routes/labels.js';
@@ -95,8 +93,6 @@ async function main() {
   const { connect, getDb } = await import('../../shared/database.js');
   await connect();
   const db = getDb();
-
-  cron.start(AcquisitionService, db);
 
   const app = createApp(db);
   app.listen(config.adminPort, () => {

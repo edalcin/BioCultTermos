@@ -57,7 +57,7 @@ router.get('/status', async (req, res, next) => {
   try {
     const db = req.app.locals.db;
     const { lastRun } = await AcquisitionService.getLastRunStatus(db);
-    res.json({ lastRun, scheduledNext: null });
+    res.json({ lastRun });
   } catch (err) {
     next(err);
   }

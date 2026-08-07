@@ -124,7 +124,6 @@ BioCultTermos/
 │       ├── services/            # ConceptService, AcquisitionService, AuditService
 │       ├── lib/
 │       │   ├── auth/            # basicAuth.js
-│       │   ├── scheduler/       # acquisitionCron.js
 │       │   └── skosxl/          # validation.js
 │       ├── shared/              # database.js
 │       └── config/              # index.js
@@ -152,7 +151,6 @@ BioCultTermos/
 | `PUBLIC_PORT` | Não | `4000` | Porta da interface pública |
 | `ADMIN_PORT` | Não | `4001` | Porta da interface admin |
 | `AUDIO_STORAGE_PATH` | Não | `/data/audio` | Path para arquivos de áudio |
-| `ACQUISITION_CRON_SCHEDULE` | Não | `0 3 * * *` | Cron da aquisição automática |
 | `LOG_LEVEL` | Não | `info` | `debug` \| `info` \| `warn` \| `error` |
 | `NODE_ENV` | Não | `development` | `development` \| `production` |
 

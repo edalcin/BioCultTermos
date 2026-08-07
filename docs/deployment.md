@@ -50,7 +50,6 @@ Exemplo de `docker/.env`:
 SQLITE_DB_PATH=/data/unidade.sqlite
 ADMIN_USERNAME=curador1
 ADMIN_PASSWORD=senha_segura_aqui
-ACQUISITION_CRON_SCHEDULE=0 3 * * *
 LOG_LEVEL=info
 ```
 

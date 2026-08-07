@@ -42,15 +42,17 @@
     "conceptsExisting": 304,
     "durationMs": 1240,
     "hasUnresolved": false
-  },
-  "scheduledNext": "2026-06-07T03:00:00Z"
+  }
 }
 ```
 
 **Response 200** (sem execuções ainda):
 ```json
-{ "lastRun": null, "scheduledNext": "2026-06-07T03:00:00Z" }
+{ "lastRun": null }
 ```
+
+> Não há campo `scheduledNext`: a aquisição só acontece sob demanda, no botão "Executar Aquisição"
+> do dashboard admin. O agendamento foi eliminado em 2026-08-07.
 
 ---
 
@@ -164,7 +166,6 @@ Para cada campo monitorado em MONITORED_FIELDS:
 
 | Variável | Descrição | Default |
 |----------|-----------|---------|
-| `ACQUISITION_CRON_SCHEDULE` | Expressão cron para agendamento | `0 3 * * *` (todo dia às 03:00) |
 | `SQLITE_DB_PATH` | Caminho do arquivo `.sqlite` compartilhado (mesmo arquivo do BioCultDB, ADR-005) | — (obrigatório) |
 | `AUDIO_STORAGE_PATH` | Diretório base para arquivos de áudio | — (obrigatório se upload usado) |
 | `ADMIN_USERS` | JSON array de credenciais `[{username, passwordHash}]` | — (obrigatório) |

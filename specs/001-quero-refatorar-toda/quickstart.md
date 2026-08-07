@@ -32,9 +32,6 @@ ADMIN_USERS=[{"username":"curador1","passwordHash":"$2b$10$SUBSTITUIR_HASH_AQUI"
 # Áudio
 AUDIO_STORAGE_PATH=/data/audio
 
-# Aquisição agendada (cron)
-ACQUISITION_CRON_SCHEDULE=0 3 * * *
-
 # Logging
 LOG_LEVEL=info
 NODE_ENV=development

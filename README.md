@@ -205,7 +205,7 @@ graph TD
 
     PUB -->|"findMany, findById\n(somente active)"| SDB
     ADM -->|"CRUD completo + audit"| SDB
-    ADM -->|"Aquisição periódica\n(cron + on-demand)"| EDBTBL
+    ADM -->|"Aquisição sob demanda\n(botão Executar Aquisição)"| EDBTBL
     EDBAPP --> EDBTBL
 
     style PUB fill:#dcfce7,color:#166534
@@ -220,14 +220,12 @@ graph TD
 
 ```mermaid
 graph LR
-    CRON["Cron Scheduler\n[node-cron]\nexecução periódica"]
     ROUTE["POST /acquisition/run\n[Express Route]"]
     SVC["AcquisitionService\n[Serviço]\nnormalização + dedup"]
     ETNTBL[("tabela biocultdb_records\n(fonte)")]
     TERMTBL[("tabela etnotermos\n(destino)")]
     LOGTBL[("etnotermos_acquisition_log")]
 
-    CRON --> SVC
     ROUTE --> SVC
     SVC -->|"lower() + trim"| ETNTBL
     SVC -->|"upsert por literalForm"| TERMTBL

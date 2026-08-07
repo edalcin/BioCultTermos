@@ -37,7 +37,7 @@ O BioCultTermos gerencia vocabulário controlado para campos do BioCultDB (padr�
 - **Graph Visualization**: Cytoscape.js (para visualização de relacionamentos entre termos)
 - **Testing**: Jest, Supertest, SQLite `:memory:`
 - **Deployment**: Docker (Alpine Linux, compatível com BioCultDB)
-- Node.js 20 LTS (ES2022+) + Express.js, better-sqlite3, HTMX 2.x, Alpine.js 3.x, Tailwind CSS 3.x (tema forest), EJS 3.x, multer, node-cron, bcrypt (001-quero-refatorar-toda)
+- Node.js 20 LTS (ES2022+) + Express.js, better-sqlite3, HTMX 2.x, Alpine.js 3.x, Tailwind CSS 3.x (tema forest), EJS 3.x, multer, bcrypt (001-quero-refatorar-toda)
 - SQLite 3 + JSON1/FTS5 — arquivo `unidade.sqlite`, tabelas `etnotermos`, `etnotermos_acquisition_log`, `etnotermos_audit_log` (001-quero-refatorar-toda)
 
 ## Architecture

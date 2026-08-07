@@ -80,7 +80,6 @@ Clique em **"Add another Path, Port, Variable..."** → **Variable** — adicion
 
 | Key | Value | Descrição |
 |---|---|---|
-| `ACQUISITION_CRON_SCHEDULE` | `0 3 * * *` | Horário de aquisição automática (padrão: 3h da manhã) |
 | `LOG_LEVEL` | `info` | Nível de log (`debug`, `info`, `warn`, `error`) |
 
 ### Volumes (banco SQLite e armazenamento de áudio)
@@ -132,14 +131,19 @@ Substitua `192.168.1.100` pelo IP do seu UNRAID:
 
 ---
 
-## Passo 5 — Disparar aquisição inicial
+## Passo 5 — Executar a aquisição
 
-O BioCultTermos lê os dados do BioCultDB automaticamente, mas você pode forçar a primeira aquisição:
+A aquisição dos termos do BioCultDB é sempre sob demanda — não existe agendamento automático. Cada
+execução sobrescreve o vocabulário candidato com o estado atual do BioCultDB, então quem decide
+quando isso acontece é o curador, clicando no botão:
 
 1. Acesse `http://192.168.1.100:4001`
 2. Faça login
-3. Clique em **Aquisição → Executar agora**
+3. Clique em **Executar Aquisição**
 4. Os termos do BioCultDB aparecerão como "candidatos" para curadoria
+
+Repita esse passo sempre que quiser sincronizar novamente com o BioCultDB — é a única forma de
+disparar a aquisição.
 
 ---
 
