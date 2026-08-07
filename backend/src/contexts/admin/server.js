@@ -48,6 +48,14 @@ export function createApp(db) {
   app.set('view engine', 'ejs');
   app.set('views', path.join(__dirname, 'views'));
 
+  // A interface pública roda em outra porta do MESMO host. Derivar o endereço do
+  // request em vez de fixá-lo: um endereço cravado no template vaza o IP de uma
+  // instalação no código-fonte e quebra em qualquer outra.
+  app.use((req, res, next) => {
+    res.locals.publicBaseUrl = `${req.protocol}://${req.hostname}:${config.publicPort}`;
+    next();
+  });
+
   app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', service: 'admin', port: config.adminPort });
   });
