@@ -2,7 +2,7 @@
 ## Versão 2.0
 
 <div align="center">
-  <img src="docs/BioCultTermosLogo.png" alt="BioCultTermos Logo" width="200">
+  <img src="manual/img/BioCultTermosLogo.png" alt="BioCultTermos Logo" width="200">
 </div>
 
 **BioCultTermos v2.0** é o **módulo de vocabulário controlado etnobotânico** da [Arquitetura BioCultural](https://github.com/edalcin/Arquitetura-BioCultural), embutido via **git submodule** em cada unidade federada (BioCultDB, BioCultRelatos, BioCultAcervos, BioCultNaturalistas), operando sob o padrão **SKOS-XL** (Simple Knowledge Organization System — eXtension for Labels).

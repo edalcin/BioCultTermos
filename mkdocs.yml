@@ -1,0 +1,64 @@
+site_name: Manual de Curadoria do BioCultTermos
+site_description: Guia didático de SKOS-XL para curadores do vocabulário de Conhecimento Tradicional Associado à Biodiversidade.
+site_url: https://edalcin.github.io/BioCultTermos/
+site_author: edalcin
+
+repo_url: https://github.com/edalcin/BioCultTermos
+repo_name: edalcin/BioCultTermos
+edit_uri: edit/main/manual/
+
+docs_dir: manual
+use_directory_urls: false
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+theme:
+  name: material
+  language: pt-BR
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Tema escuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Tema claro
+  features:
+    - navigation.top
+    - navigation.footer
+    - content.action.edit
+    - search.highlight
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Início: index.md
+  - 1. O problema: 01-o-problema.md
+  - 2. Termo × Conceito: 02-termo-e-conceito.md
+  - 3. Rótulos (SKOS-XL): 03-rotulos.md
+  - 4. Definição e Notas: 04-definicao-e-notas.md
+  - 5. Ciclo de vida: 05-ciclo-de-vida.md
+  - 6. Relações semânticas: 06-relacoes-semanticas.md
+  - 7. Guia de decisão: 07-guia-de-decisao.md
+  - 8. Passo a passo na tela: 08-passo-a-passo.md
+  - 9. Exemplo completo: 09-exemplo-completo.md
+  - 10. Curando um Campo Semântico inteiro: 10-campo-semantico-inteiro.md
+  - 11. Erros comuns: 11-erros-comuns.md
+  - 12. Glossário: 12-glossario.md

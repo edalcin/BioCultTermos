@@ -69,4 +69,4 @@ Thumbs.db
 # Security audit reports and related files (local only, sensitive information)
 audit/
 
-graphify-out/
+graphify-out/site
