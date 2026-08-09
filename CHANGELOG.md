@@ -14,6 +14,43 @@ opcional, como diziam o ADR-007 F3 e o ADR-010.
 
 ---
 
+## 2026-08-09 — origem: BioCultDB (documentação)
+
+`README.md` passa a informar o **modo de operação** deste repositório, em seção própria logo abaixo
+do cabeçalho, antes de qualquer coisa sobre SKOS-XL.
+
+Motivo: quem chega por `github.com/edalcin/BioCultTermos` não tinha como saber que este repositório
+não se clona, que a edição acontece dentro de uma Unidade Hospedeira, nem que desde o ADR-013 ele
+carrega os tokens visuais de cinco aplicações. A regra existia nos ADRs; não estava na porta de
+entrada.
+
+A nova seção cobre: por que não se clona (ADR-012 G2, com o incidente real que originou a regra),
+onde se edita, o ritual de dois comandos (`pull --ff-only` / `push`), a adoção obrigatória e
+assíncrona (G4) e sua consequência — todo commit precisa ser seguro para as quatro unidades —, a
+fronteira código/conteúdo, e as **duas responsabilidades** do repositório: vocabulário controlado e
+identidade visual da arquitetura.
+
+Afirmações obsoletas corrigidas no mesmo passo:
+
+- "propagadas às demais unidades **quando cada uma decide** incorporar" → a adoção é obrigatória e
+  assíncrona desde o ADR-012 G4, que supersede o ADR-007 F3 e o ADR-010 nesse ponto.
+- Tabela de unidades hospedeiras dizia "repositório ainda sem código" para Relatos, Naturalistas e
+  Acervos — os três têm Cópia de Trabalho e home page desde 2026-08-09. Coluna nova distingue ter a
+  Cópia de Trabalho de conseguir exercitar o módulo (sem `Dockerfile.unidade`, o bump é
+  escrituração).
+- "ninguém sobe seu `docker-compose.yml` isoladamente" → o diretório `docker/` foi removido; não há
+  o que subir.
+- "Deploy: Docker (Alpine Linux)" → não há deploy próprio; o módulo vai na imagem dual-app da
+  unidade.
+- "Instalação e Desenvolvimento" mandava `cd backend` sem dizer de onde — contradizia a proibição de
+  clone. Agora diz explicitamente que é dentro da Cópia de Trabalho de um hospedeiro.
+- Bloqueio do `AcquisitionService` estava descrito como "tabela hardcoded". É mais que isso: a
+  travessia usa `comunidades[].nome` como dimensão de atribuição, e generalizar exige a **Fonte de
+  Atribuição** `{tipo, nome}` do ADR-012 G5, porque Comunidade Tradicional e proveniência histórica
+  não são a mesma coisa.
+
+---
+
 ## 2026-08-09 — origem: BioCultDB (mudança transversal)
 
 Identidade visual da arquitetura passa a ter fonte única, dentro deste módulo.
