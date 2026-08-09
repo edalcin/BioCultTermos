@@ -16,6 +16,8 @@ opcional, como diziam o ADR-007 F3 e o ADR-010.
 
 ## 2026-08-09 — origem: BioCultDB
 
+**Commit**: `726fd56`
+
 Sem mudança de código. Documentação do módulo alinhada ao
 [ADR-012](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md),
 que fecha três lacunas do ADR-007/ADR-010 expostas por um sintoma real: um clone standalone deste
