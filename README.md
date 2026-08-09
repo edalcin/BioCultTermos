@@ -125,6 +125,8 @@ da Arquitetura BioCultural.
 
 **Este repositório está congelado como produto standalone** desde a integração com o BioCultDB (julho de 2026, ver ADR-001 abaixo): ninguém sobe seu `docker-compose.yml` isoladamente em produção, e ele não recebe roadmap próprio. Toda evolução acontece através das unidades hospedeiras:
 
+> **ADR-012 G2 e G4**: Clonar este repositório isoladamente é proibido — um clone standalone não roda nem testa (ADR-007 F2). Toda edição acontece dentro da Cópia de Trabalho de uma Unidade Hospedeira (BioCultDB, BioCultRelatos, BioCultAcervos ou BioCultNaturalistas), especificamente na unidade que motivou a mudança. Toda versão publicada aqui deve ser adotada por todas as quatro unidades de forma obrigatória e assíncrona.
+
 | Unidade hospedeira | Ferramenta principal | Status da integração |
 |---|---|---|
 | Iniciativa de Fontes Secundárias | [BioCultDB](https://github.com/edalcin/BioCultDB) | **Implementado, em produção** desde 2026-07-13 — `BioCultDB/integracao.md`, `BioCultDB/docs/decisions/ADR-001-integracao-bioculttermos.md` |

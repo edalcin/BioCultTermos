@@ -122,6 +122,26 @@ npm run watch:css     # Watch mode para desenvolvimento
 7. **Admin Access Control**: Admin interface protected (network-level or basic auth)
 8. **CARE Principles**: Culturally sensitive data management for traditional knowledge
 9. **Test-Driven Development**: Integration tests → Unit tests → Implementation
+## Onde este código é mantido
+
+Este repositório é o **Módulo Compartilhado** BioCultTermos: o lugar onde o código *reside*, não um lugar
+onde se *trabalha*. Desde o ADR-007 F2 ele está congelado como produto standalone — não há Docker
+próprio, não há como executá-lo nem testá-lo fora de uma Unidade Hospedeira.
+
+**Clonar este repositório isoladamente é proibido pelo ADR-012 G2.** Um clone standalone não roda, não
+testa, e a única coisa que faz de forma confiável é envelhecer até divergir.
+
+Toda edição acontece dentro da Cópia de Trabalho de uma Unidade Hospedeira — `BioCultDB/bioculttermos/`,
+`BioCultRelatos/bioculttermos/`, `BioCultNaturalistas/bioculttermos/` ou `BioCultAcervos/bioculttermos/` —
+especificamente na unidade que motivou a mudança, porque é lá que ela pode ser executada contra o SQLite
+real antes de ser publicada.
+
+Toda versão publicada aqui **deve** ser adotada por todas as quatro unidades (ADR-012 G4, obrigatória e
+assíncrona). Consequência direta: **todo commit precisa ser seguro para todas as unidades** — nenhum
+comportamento específico de uma unidade pode entrar neste código (ADR-007 F5, ADR-012 G5).
+
+Decisão: `Arquitetura-BioCultural/docs/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md`
+
 
 ## Recent Changes
 - 2026-06-07: v2.0 — padrão SKOS-XL, integração BioCultDB, limpeza completa do repositório
@@ -145,3 +165,13 @@ Rules:
 ## Arquitetura v3.1 — Persistência
 Persistência = SQLite com JSON (JSON1), **um arquivo por unidade federada** compartilhado pelas ferramentas (tabelas distintas), WAL, `SQLITE_DB_PATH`. Um container por unidade. Sem dependência de banco de dados de documentos externo.
 Ref.: Arquitetura-BioCultural/docs/architecture-decisions/ADR-005.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live as GitHub issues, managed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context layout (`CONTEXT.md` + `docs/adr/` at the repo root). See `docs/agents/domain.md`.

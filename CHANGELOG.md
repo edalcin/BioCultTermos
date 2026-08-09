@@ -8,8 +8,34 @@ precisar ler `git log` diretamente.
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/). Toda entrada nova segue
 o fluxo obrigatório do [ADR-010](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-010-central-documentation-and-build-verification.md)
-(push + esta documentação são obrigatórios; bump do submodule em outras unidades continua opcional,
-ADR-007 F3).
+(push + esta documentação são obrigatórios) e o [ADR-012](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md),
+que tornou o bump do submodule nas demais unidades **obrigatório e assíncrono** (G4) — não mais
+opcional, como diziam o ADR-007 F3 e o ADR-010.
+
+---
+
+## 2026-08-09 — origem: BioCultDB
+
+Sem mudança de código. Documentação do módulo alinhada ao
+[ADR-012](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md),
+que fecha três lacunas do ADR-007/ADR-010 expostas por um sintoma real: um clone standalone deste
+repositório sobrevivendo fora de qualquer unidade hospedeira, sete commits atrás deste remoto, com
+trabalho não publicado preso dentro dele (duas stashes e uma seção de `CLAUDE.md`).
+
+- `CLAUDE.md`: nova seção **Onde este código é mantido**. Clonar este repositório isoladamente passa a
+  ser proibido (G2) — desde o ADR-007 F2 ele não roda nem testa fora de uma unidade hospedeira, e a
+  única coisa que um clone solto faz de forma confiável é envelhecer até divergir. Toda edição acontece
+  na Cópia de Trabalho da unidade que motivou a mudança.
+- `README.md`: mesma advertência, na seção de distribuição.
+- `CHANGELOG.md`: o cabeçalho deste arquivo ainda afirmava que o bump nas outras unidades era opcional.
+  Não é mais (ADR-012 G4).
+- `docs/agents/`: `domain.md` e `issue-tracker.md`, resgatados do clone obsoleto antes de removê-lo.
+
+**Consequência para quem escreve código aqui**: como toda unidade hospedeira passa a ser obrigada a
+adotar toda versão publicada, todo commit precisa ser seguro para as quatro. Nenhum comportamento
+específico de uma unidade entra neste repositório (ADR-007 F5, ADR-012 G5). O bloqueio conhecido é o
+`AcquisitionService`, que hardcoda a travessia documental do BioCultDB — a generalização decidida é a
+**Fonte de Atribuição** `{tipo, nome}` (ADR-012 G5), ainda por implementar.
 
 ---
 
