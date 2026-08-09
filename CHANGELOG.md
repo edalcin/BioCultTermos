@@ -14,6 +14,33 @@ opcional, como diziam o ADR-007 F3 e o ADR-010.
 
 ---
 
+## 2026-08-09 — origem: BioCultDB (mudança transversal)
+
+Identidade visual da arquitetura passa a ter fonte única, dentro deste módulo.
+
+- `tailwind.preset.cjs` (novo): preset Tailwind com a paleta `forest`. Consumido por
+  `presets: [require('./bioculttermos/tailwind.preset.cjs')]` no `tailwind.config.js` da unidade.
+- `frontend/src/styles/biocult-base.css` (novo): `@layer base` e `@layer components` compartilhados
+  (`.btn*`, `.card`, `.form-*`, `.badge`). Importado pelo `main.css` da unidade.
+
+**Motivo**: a identidade visual é exigida como idêntica em todas as unidades federadas
+(`CLAUDE.md` de cada uma, `constitution.md` §III) e não era garantida por nada. A paleta já estava
+copiada em dois `tailwind.config.js` e já havia divergido — BioCultDB 50–900 contra BioCultTermos
+50–950, e `.btn` `px-4 py-2` contra `px-6 py-3`. Com cinco unidades, cópia vira bifurcação: o mesmo
+problema que o ADR-012 resolveu para o código, na camada de apresentação.
+
+Este módulo é o lugar porque as quatro Unidades Hospedeiras já o carregam — os tokens propagam pelo
+mecanismo do ADR-012, com Atraso de Módulo medido, sem repositório novo nem registry. Que um módulo
+de vocabulário hospede tokens de design é um desvio de responsabilidade assumido: o preço de não
+criar um segundo módulo compartilhado para ~40 linhas. Caminho de saída registrado no cabeçalho do
+preset.
+
+**Aditivo, não muda nada do que roda**: nem o BioCultDB nem este módulo consomem os arquivos novos
+ainda. Migrá-los é refatoração de UI em produção e pede verificação própria. Quem consome desde já
+são BioCultRelatos, BioCultNaturalistas e BioCultAcervos, que nascem sem CSS de tema próprio.
+
+---
+
 ## 2026-08-09 — origem: BioCultDB
 
 **Commit**: `726fd56`

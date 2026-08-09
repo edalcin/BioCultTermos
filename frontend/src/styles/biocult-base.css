@@ -1,0 +1,93 @@
+/**
+ * Base visual da Arquitetura BioCultural — componentes compartilhados.
+ *
+ * Par do `tailwind.preset.cjs`: o preset carrega os tokens (cores), este arquivo
+ * carrega os componentes (@layer base e @layer components). Juntos são a identidade
+ * visual que toda Unidade Federada deve apresentar.
+ *
+ * USO, no `main.css` da unidade — depois das diretivas do Tailwind:
+ *
+ *   @tailwind base;
+ *   @tailwind components;
+ *   @tailwind utilities;
+ *   @import "../../../bioculttermos/frontend/src/styles/biocult-base.css";
+ *
+ * A CLI do Tailwind resolve o `@import` (traz postcss-import embutido). Depois dele,
+ * a unidade acrescenta o que for genuinamente seu — e só isso.
+ *
+ * NÃO consumido ainda por BioCultDB nem pelo próprio BioCultTermos: os dois têm CSS
+ * de componentes próprio, divergente entre si (`.btn` px-4 py-2 contra px-6 py-3).
+ * Migrá-los é refatoração de UI em produção e pede verificação própria; este arquivo
+ * é aditivo e não muda pixel nenhum do que já roda. O `.btn` canônico abaixo é o do
+ * BioCultDB, que é a unidade em produção; a variante maior virou `.btn-lg`.
+ */
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+
+  h1 {
+    @apply text-3xl font-bold text-gray-900 mb-4;
+  }
+
+  h2 {
+    @apply text-2xl font-semibold text-gray-800 mb-3;
+  }
+
+  h3 {
+    @apply text-xl font-medium text-gray-700 mb-2;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-colors duration-200;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 rounded-lg;
+  }
+
+  .btn-primary {
+    @apply btn bg-forest-600 text-white hover:bg-forest-700 focus:ring-2 focus:ring-forest-500 focus:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply btn bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-2 focus:ring-gray-400 focus:ring-offset-2;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-md p-6;
+  }
+
+  .form-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-forest-500;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+
+  .badge {
+    @apply px-3 py-1 text-sm rounded-full font-medium;
+  }
+
+  .error-message {
+    @apply text-red-600 text-sm mt-1;
+  }
+
+  .success-message {
+    @apply text-green-600 text-sm mt-1;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
