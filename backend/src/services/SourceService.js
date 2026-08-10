@@ -16,10 +16,6 @@ const MONITORED_FIELDS = {
     `EXISTS(SELECT 1 FROM json_each(doc,'$.comunidades') com WHERE LOWER(json_extract(com.value,'$.tipo'))=LOWER(?))`,
   'comunidades.atividadesEconomicas': () =>
     `EXISTS(SELECT 1 FROM json_each(doc,'$.comunidades') com, json_each(com.value,'$.atividadesEconomicas') ae WHERE LOWER(ae.value)=LOWER(?))`,
-  // Legacy, read-only: no longer acquired (out of curation scope since 2026-08-10),
-  // but the concepts seeded before that date must keep resolving their sources.
-  'comunidades.plantas.nomeCientifico': () =>
-    `EXISTS(SELECT 1 FROM json_each(doc,'$.comunidades') com, json_each(com.value,'$.plantas') pl, json_each(pl.value,'$.nomeCientifico') pv WHERE LOWER(pv.value)=LOWER(?))`,
   'comunidades.plantas.nomeVernacular': () =>
     `EXISTS(SELECT 1 FROM json_each(doc,'$.comunidades') com, json_each(com.value,'$.plantas') pl, json_each(pl.value,'$.nomeVernacular') pv WHERE LOWER(pv.value)=LOWER(?))`,
   'comunidades.plantas.tipoUso': () =>

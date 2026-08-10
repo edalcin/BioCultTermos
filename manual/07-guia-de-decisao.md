@@ -146,10 +146,10 @@ graph LR
 > do táxon e `vernacularName` como atributo **associado**, muitos-para-um — associação, não
 > identidade. É exatamente a forma do objeto `planta` no BioCultDB.
 
-> **Conceitos históricos.** Os nomes científicos semeados antes da decisão continuam no banco,
-> congelados como `candidate` e acháveis pelo filtro *"Nomes Científicos de Plantas (histórico —
-> fora de escopo)"*. Não se cura, não se deprecia, não se apaga: **não se toca**
-> ([§7.6](#s7-6) vale igual).
+> **Não há conceitos de nome científico neste vocabulário.** Os que a aquisição havia semeado no
+> BioCultDB foram **removidos** em 2026-08-10 (864 conceitos, nenhum deles curado: zero rótulos
+> `alt`, zero definições, zero notas). O Campo Semântico não existe mais na tela. O nome científico
+> não sai do sistema — ele nunca esteve aqui de verdade: vive na Evidência do BioCultDB.
 
 ### 7.4 Termos compostos: preserve as duas metades {#s7-4}
 

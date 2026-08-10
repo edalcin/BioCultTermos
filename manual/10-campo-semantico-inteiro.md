@@ -12,15 +12,17 @@ caminho do campo de origem no registro do BioCultDB. Distribuição real hoje:
 | `sourceFields` | Conceitos |
 |---|---:|
 | `comunidades.plantas.nomeVernacular` | 982 |
-| `comunidades.plantas.nomeCientifico` | 864 — fora de escopo desde 2026-08-10, congelado |
+| ~~`comunidades.plantas.nomeCientifico`~~ | ~~864~~ — **removido do vocabulário em 2026-08-10** |
 | `comunidades.plantas.tipoUso` | **713, já curado** |
 | `comunidades.atividadesEconomicas` | 36 |
 | `comunidades.tipo` | 9 |
 
 > **`comunidades.plantas.nomeCientifico` saiu do escopo de curadoria em 2026-08-10.** Não existe
 > decisão de curadoria legítima a tomar sobre um binômio latino: nome aceito, sinônimo e basiônimo
-> são regidos pelo ICN e verificáveis em WFO/IPNI/GBIF. Os 864 conceitos acima ficam preservados
-> como registro histórico, fora da fila de curadoria — ver
+> são regidos pelo ICN e verificáveis em WFO/IPNI/GBIF. Os 864 conceitos foram **removidos** do
+> `etnotermos` — e a medição feita antes confirmou a decisão: nenhum deles tinha rótulo `alt`,
+> definição ou nota de escopo. O nome científico permanece **dado da Evidência no BioCultDB**, que
+> não foi tocado. Ver
 > `BioCultDB/docs/curadoria/decisao-nomes-cientificos-fora-de-escopo.md`.
 
 Um conceito pode pertencer a mais de um campo ([§7.6](07-guia-de-decisao.md#s7-6)).

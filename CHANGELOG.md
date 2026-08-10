@@ -25,15 +25,20 @@ em `BioCultDB/docs/curadoria/decisao-nomes-cientificos-fora-de-escopo.md`.
 - `backend/src/services/AcquisitionService.js`: `nomeCientifico` removido de `MONITORED_FIELDS` —
   a Aquisição passa a monitorar 4 campos (`comunidades.tipo`, `comunidades.plantas.nomeVernacular`,
   `comunidades.plantas.tipoUso`, `comunidades.atividadesEconomicas`), não mais 5.
-- `backend/src/contexts/admin/views/concepts/list.ejs`: a opção do filtro por nome científico foi
-  **mantida**, relabelada para `Nomes Científicos de Plantas (histórico — fora de escopo)`, para
-  que o curador ainda localize o legado.
-- `backend/src/services/SourceService.js`: o resolvedor de Fontes do campo é **mantido como legado
-  somente leitura**, para que os ~864 conceitos já semeados continuem exibindo suas Fontes.
+- `backend/src/contexts/admin/views/concepts/list.ejs`: a opção "Nomes Científicos de Plantas" foi
+  **removida** do filtro por Campo Semântico.
+- `backend/src/services/SourceService.js`: o resolvedor de Fontes do campo foi removido.
+- `backend/src/contexts/admin/views/partials/help/`: a ajuda que ensinava a tratar nome científico
+  como conceito (`labels.ejs`, `relations.ejs`) foi removida.
+- Purga de dados no BioCultDB, com backup verificado e execução seca antes:
+  **2632 → 1768 conceitos** (−864), FTS em sincronia, 1 referência órfã limpa (`aroeira`),
+  0 `sourceFields` mistos. Script em
+  `BioCultDB/docs/curadoria/purga-nomes-cientificos.mjs`.
 
-**Nenhum dado foi apagado.** O campo continua obrigatório na Planta do BioCultDB (formulário,
-validação, FTS, estatísticas, etnoChat); os conceitos já semeados em `etnotermos` ficam
-preservados, congelados, fora da fila de curadoria.
+**O dado de origem não foi tocado.** `biocultdb_records` manteve as 29 Evidências e as 1827
+ocorrências de nome científico. O campo continua obrigatório na Planta do BioCultDB (formulário,
+validação, FTS, estatísticas, etnoChat). O que saiu foi vocabulário **derivado**, reconstruível por
+uma execução de aquisição.
 
 ---
 

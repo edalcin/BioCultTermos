@@ -277,13 +277,16 @@ describe('Admin Concepts/Labels API', () => {
       expect(res.text).toMatch(/Mostrando 21–25 de 25 termos/);
     });
 
-    it('the semantic field filter includes nomeCientifico as an option', async () => {
+    it('the semantic field filter does not offer nomeCientifico', async () => {
       requireApp();
       const res = await request(app)
         .get('/concepts')
         .set('Authorization', validAuth);
+
       expect(res.status).toBe(200);
-      expect(res.text).toContain('comunidades.plantas.nomeCientifico');
+      expect(res.text).not.toContain('comunidades.plantas.nomeCientifico');
+      // the four in-scope fields are still offered
+      expect(res.text).toContain('comunidades.plantas.nomeVernacular');
     });
 
     it('the status filter reflects the active ?status= selection', async () => {
