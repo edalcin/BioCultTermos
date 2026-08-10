@@ -19,6 +19,7 @@
 | Gravar rótulo em inglês com `language: por`. | `eng`. A convenção é ISO 639-3, e ela existe para caber `tup`, `kgp`, `gub` ([§3.2](03-rotulos.md#s3-2)). |
 | Tratar `febre` e `antitérmico` como o mesmo conceito. | São ramos irmãos sob `medicinal`: indicação × ação farmacológica ([§6.5](06-relacoes-semanticas.md#s6-5)). |
 | Depreciar um termo que pertence a outro Campo Semântico. | Não tocar ([§7.6](07-guia-de-decisao.md#s7-6)) — ele será curado quando aquele campo for. |
+| Curar, depreciar ou criar conceito de nome científico. | Fora de escopo — ver [§7.3](07-guia-de-decisao.md#s7-3); o dado vive no BioCultDB e a autoridade é externa (WFO/IPNI). |
 
 **Princípio geral:** na dúvida entre criar um conceito novo ou enriquecer um existente, prefira
 **enriquecer** — menos conceitos, mais rótulos e relações. Um vocabulário bem curado é raso em

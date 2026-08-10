@@ -78,27 +78,33 @@ diferentes (por morfotipo, sexo, estágio ou uso), embora o botânico os agrupe 
 Nesse caso são **dois etnotáxons distintos**:
 
 - ligue-os entre si por **Relacionado (RT)** (associados, mas distintos);
-- e mapeie **cada um** ao mesmo nome científico.
+- o nome científico que o botânico atribui aos dois **não entra aqui**: ele fica registrado na
+  Evidência do BioCultDB, ao lado de cada nome vernacular ([§7.3](#s7-3)).
 
 ```mermaid
 graph TD
     Q{"A comunidade trata os<br/>nomes como a MESMA planta?"}
     Q -->|Sim| A["Um conceito<br/>· 1 pref + demais alt<br/>(rótulos alternativos)"]
-    Q -->|"Não, são plantas<br/>diferentes para ela"| R["Dois conceitos<br/>· ligados por Relacionado (RT)<br/>· cada um mapeado ao nome científico"]
+    Q -->|"Não, são plantas<br/>diferentes para ela"| R["Dois conceitos<br/>· ligados por Relacionado (RT)"]
 ```
 
 > **Compartilhar a espécie científica não basta** para ser o mesmo conceito. Co-referência não é
 > identidade conceitual: quem decide se é um ou dois conceitos é a distinção de significado na
 > comunidade, não a determinação taxonômica.
 
-### 7.3 Nome científico × nome vernacular: dois conceitos, não um {#s7-3}
+### 7.3 Nome científico: dado do BioCultDB, não conceito daqui {#s7-3}
 
 Pergunta natural: se o nome científico e o nome vernacular apontam para "a mesma espécie", não
 deveriam ser **um só conceito** (o científico como `pref/lat`, o vernacular como `pref/por`)?
 **Não.** Eles **co-referem** — apontam para plantas sobrepostas no mundo real — mas **não são o
-mesmo conceito**. Co-referência não é identidade conceitual ([§2](02-termo-e-conceito.md#s2)). São
-**dois conceitos distintos**, cada um no seu campo, ligados por uma relação de **mapeamento** (na
-paleta atual da tela, o análogo é **Relacionado (RT)**). Três razões:
+mesmo conceito**. Co-referência não é identidade conceitual ([§2](02-termo-e-conceito.md#s2)).
+
+E desde **2026-08-10** a pergunta deixou de se colocar neste vocabulário: o Campo Semântico
+"Nomes Científicos de Plantas" **saiu do escopo de curadoria**
+([decisão](https://github.com/edalcin/BioCultDB/blob/main/docs/curadoria/decisao-nomes-cientificos-fora-de-escopo.md)).
+O nome científico permanece **dado da Planta no BioCultDB**, verificável em autoridade externa
+(WFO, IPNI, GBIF). Aqui, o conceito é só o vernacular. As três razões que impediam a fusão são as
+mesmas que tiraram o campo do escopo:
 
 **1. Etnotaxonomia ≠ taxonomia científica.** O nome vernacular denota um *etnotáxon* — uma unidade
 de classificação **cultural**, que raramente casa 1:1 com a espécie lineana:
@@ -110,33 +116,40 @@ de classificação **cultural**, que raramente casa 1:1 com a espécie lineana:
 - **Homonímia regional:** o mesmo vernacular para espécies não aparentadas em regiões diferentes; e
   uma espécie com dezenas de vernaculares por povo/língua.
 
-**2. O nome científico tem estrutura própria.** Sob o **ICN** (código internacional de nomenclatura
-botânica), uma espécie carrega nome aceito, basiônimo, sinônimos e autoria — uma **rede de
-sinonímia** que o BioCultTermos modela com "Sinônimo de (aceito)"
-([§6.3](06-relacoes-semanticas.md#s6-3)) e depreciação ([§5](05-ciclo-de-vida.md#s5)).
-Rebaixar o científico a um mero rótulo de um conceito fundido apagaria essa estrutura.
+Fundir os dois achataria essa plasticidade num falso 1:1.
 
-**3. Governanças diferentes.** O científico é regido pelo ICN (objetivo, verificável em WFO/IPNI,
-público). O vernacular é regido pela **comunidade** (CARE, [§3.3](03-rotulos.md#s3-3)), com
-proveniência por povo ([§3.4](03-rotulos.md#s3-4)) e podendo ser `restricted`/`sacred`. Fundir os
-dois forçaria um binômio latino público e um nome tradicional (às vezes sagrado) a dividir o mesmo
-`accessLevel` e a mesma autoridade — o que é incorreto.
+**2. O nome científico tem estrutura própria — e ela é mantida fora daqui.** Sob o **ICN** (código
+internacional de nomenclatura botânica), uma espécie carrega nome aceito, basiônimo, sinonímia
+homotípica e heterotípica, autoria e ano. Essa rede é decidida por **revisão taxonômica** e
+publicada em WFO/IPNI/POWO — um curador do BioCultTermos não tem autoridade para decidi-la.
+Aplicar "Sinônimo de (aceito)" ([§6.3](06-relacoes-semanticas.md#s6-3)) a um binômio afirmaria uma
+nomenclatura que o código não sustenta. Não é só inútil: é uma superfície de erro.
 
-Como fica na prática — dois conceitos, uma ponte de mapeamento:
+**3. Governanças diferentes.** O científico é regido pelo ICN (objetivo, verificável, público). O
+vernacular é regido pela **comunidade** (CARE, [§3.3](03-rotulos.md#s3-3)), com proveniência por
+povo ([§3.4](03-rotulos.md#s3-4)) e podendo ser `restricted`/`sacred`. Um binômio latino não tem o
+que fazer com `accessLevel`, `sourcePeople` ou `holderPeople` — os instrumentos centrais deste
+vocabulário são inertes sobre ele.
+
+Como fica na prática — um conceito curado, dois vínculos que já existem:
 
 ```mermaid
 graph LR
-    subgraph Cientifico["Campo: Nomes Científicos (ICN)"]
-        SCI["<i>Stachytarpheta cayennensis</i>"]
-    end
-    subgraph Vernacular["Campo: Nomes Vernaculares (etnotáxon, CARE)"]
-        VER["gervão<br/>(povo, accessLevel)"]
-    end
-    VER -. "Relacionado (RT) / mapeamento" .-> SCI
+    VER["Conceito: <b>gervão</b><br/>etnotáxon, CARE<br/>(o único curado aqui)"]
+    EVI["Evidência no BioCultDB<br/>planta: nomeVernacular + nomeCientifico"]
+    AUT(["Autoridade externa<br/>WFO · IPNI · GBIF"])
+    VER -- "co-ocorrência<br/>por Evidência" --> EVI
+    EVI -- "<i>Stachytarpheta cayennensis</i><br/>verificável em" --> AUT
 ```
 
 > **Alinha com o Darwin Core** (referência no rodapé): DwC trata `scientificName` como identidade
-> do táxon e `vernacularName` como atributo **associado** — associação, não identidade.
+> do táxon e `vernacularName` como atributo **associado**, muitos-para-um — associação, não
+> identidade. É exatamente a forma do objeto `planta` no BioCultDB.
+
+> **Conceitos históricos.** Os nomes científicos semeados antes da decisão continuam no banco,
+> congelados como `candidate` e acháveis pelo filtro *"Nomes Científicos de Plantas (histórico —
+> fora de escopo)"*. Não se cura, não se deprecia, não se apaga: **não se toca**
+> ([§7.6](#s7-6) vale igual).
 
 ### 7.4 Termos compostos: preserve as duas metades {#s7-4}
 

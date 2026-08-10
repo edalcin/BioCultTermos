@@ -14,6 +14,29 @@ opcional, como diziam o ADR-007 F3 e o ADR-010.
 
 ---
 
+## 2026-08-10 — origem: BioCultTermos (mudança de escopo de curadoria)
+
+O Campo Semântico **"Nomes Científicos de Plantas"** (`comunidades.plantas.nomeCientifico`) sai do
+escopo de curadoria do vocabulário controlado. Não existe decisão de curadoria legítima a tomar
+sobre um binômio latino — nome aceito, sinônimo e basiônimo são regidos pelo ICN e verificáveis em
+WFO/IPNI/GBIF; manter uma cópia curada local só cria dívida e superfície de erro. Decisão completa
+em `BioCultDB/docs/curadoria/decisao-nomes-cientificos-fora-de-escopo.md`.
+
+- `backend/src/services/AcquisitionService.js`: `nomeCientifico` removido de `MONITORED_FIELDS` —
+  a Aquisição passa a monitorar 4 campos (`comunidades.tipo`, `comunidades.plantas.nomeVernacular`,
+  `comunidades.plantas.tipoUso`, `comunidades.atividadesEconomicas`), não mais 5.
+- `backend/src/contexts/admin/views/concepts/list.ejs`: a opção do filtro por nome científico foi
+  **mantida**, relabelada para `Nomes Científicos de Plantas (histórico — fora de escopo)`, para
+  que o curador ainda localize o legado.
+- `backend/src/services/SourceService.js`: o resolvedor de Fontes do campo é **mantido como legado
+  somente leitura**, para que os ~864 conceitos já semeados continuem exibindo suas Fontes.
+
+**Nenhum dado foi apagado.** O campo continua obrigatório na Planta do BioCultDB (formulário,
+validação, FTS, estatísticas, etnoChat); os conceitos já semeados em `etnotermos` ficam
+preservados, congelados, fora da fila de curadoria.
+
+---
+
 ## 2026-08-09 — origem: BioCultDB (documentação)
 
 `README.md` passa a informar o **modo de operação** deste repositório, em seção própria logo abaixo

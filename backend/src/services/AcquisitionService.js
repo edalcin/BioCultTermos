@@ -7,9 +7,14 @@ import {
 } from '../models/AcquisitionLog.js';
 import { REFERENCE_TERMS } from '../data/referenceTerms.js';
 
+// Scientific names are deliberately NOT here: `comunidades.plantas.nomeCientifico`
+// left the curation scope on 2026-08-10 — it is governed by the ICN and verifiable
+// against WFO/IPNI/GBIF, so no legitimate curation decision exists for it here. It
+// stays a first-class Evidence field in BioCultDB. Concepts seeded before that date
+// are preserved, frozen, and still reachable in the admin filter.
+// See BioCultDB/docs/curadoria/decisao-nomes-cientificos-fora-de-escopo.md
 const MONITORED_FIELDS = [
   'comunidades.tipo',
-  'comunidades.plantas.nomeCientifico',
   'comunidades.plantas.nomeVernacular',
   'comunidades.plantas.tipoUso',
   'comunidades.atividadesEconomicas',
@@ -76,11 +81,6 @@ function collectFieldValues(db) {
           communityName
         );
         collect(grouped.get('comunidades.plantas.tipoUso'), toArray(planta?.tipoUso), communityName);
-        collect(
-          grouped.get('comunidades.plantas.nomeCientifico'),
-          toArray(planta?.nomeCientifico),
-          communityName
-        );
       }
     }
   }

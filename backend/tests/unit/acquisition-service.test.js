@@ -240,11 +240,12 @@ describe('AcquisitionService — unit tests', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Scientific name extraction
+  // Scientific names are OUT OF SCOPE
+  // BioCultDB/docs/curadoria/decisao-nomes-cientificos-fora-de-escopo.md
   // ---------------------------------------------------------------------------
 
-  describe('nomeCientifico extraction', () => {
-    test('scientific names are extracted as candidate concepts', async () => {
+  describe('nomeCientifico is out of scope', () => {
+    test('scientific names do not become concepts, but their sibling vernacular still does', async () => {
       insertBiocultdbRecord(db, {
         comunidades: [
           {
@@ -258,10 +259,9 @@ describe('AcquisitionService — unit tests', () => {
 
       await AcquisitionService.run(db);
 
-      const concept = findConceptByPrefLabel(db, 'foeniculum vulgare');
-      expect(concept).not.toBeNull();
-      expect(concept.sourceFields).toContain('comunidades.plantas.nomeCientifico');
-      expect(concept.status).toBe('candidate');
+      expect(findConceptByPrefLabel(db, 'foeniculum vulgare')).toBeNull();
+      // Guards the plant loop: dropping the field must not stop the siblings.
+      expect(findConceptByPrefLabel(db, 'erva-doce')).not.toBeNull();
     });
   });
 

@@ -12,10 +12,16 @@ caminho do campo de origem no registro do BioCultDB. Distribuição real hoje:
 | `sourceFields` | Conceitos |
 |---|---:|
 | `comunidades.plantas.nomeVernacular` | 982 |
-| `comunidades.plantas.nomeCientifico` | 864 |
+| `comunidades.plantas.nomeCientifico` | 864 — fora de escopo desde 2026-08-10, congelado |
 | `comunidades.plantas.tipoUso` | **713, já curado** |
 | `comunidades.atividadesEconomicas` | 36 |
 | `comunidades.tipo` | 9 |
+
+> **`comunidades.plantas.nomeCientifico` saiu do escopo de curadoria em 2026-08-10.** Não existe
+> decisão de curadoria legítima a tomar sobre um binômio latino: nome aceito, sinônimo e basiônimo
+> são regidos pelo ICN e verificáveis em WFO/IPNI/GBIF. Os 864 conceitos acima ficam preservados
+> como registro histórico, fora da fila de curadoria — ver
+> `BioCultDB/docs/curadoria/decisao-nomes-cientificos-fora-de-escopo.md`.
 
 Um conceito pode pertencer a mais de um campo ([§7.6](07-guia-de-decisao.md#s7-6)).
 
@@ -83,7 +89,8 @@ possível `restricted`/`sacred`, e o desempate de preferencial entre nomes co-ig
 nota de escopo prescrita em [§3.5](03-rotulos.md#s3-5) e da regra de ouro de
 [§7.2](07-guia-de-decisao.md#s7-2).
 
-**`nomeCientifico` não se funde com `nomeVernacular`** ([§7.3](07-guia-de-decisao.md#s7-3)).
+**`nomeCientifico` deixou de ser conceito neste vocabulário** — a questão da fusão com
+`nomeVernacular` não se coloca mais aqui; ver [§7.3](07-guia-de-decisao.md#s7-3).
 
 ## 10.6 O que ficou em aberto na campanha dos tipos de uso {#s10-6}
 

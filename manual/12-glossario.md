@@ -14,7 +14,7 @@
 | **Sinônimo de (aceito) / Sinônimos deste conceito** | Relação direcionada entre dois conceitos separados, marcando qual é o preferido. |
 | **Status: candidato / ativo / depreciado** | Ciclo de vida do conceito. |
 | **CARE** | Princípios de governança de dados indígenas: *Collective benefit, Authority to control, Responsibility, Ethics*. |
-| **Campo Semântico** | O conjunto de conceitos que vieram do mesmo campo de origem do BioCultDB; tecnicamente, o array `sourceFields` do conceito. Um conceito pode pertencer a mais de um. |
+| **Campo Semântico** | O conjunto de conceitos que vieram do mesmo campo de origem do BioCultDB; tecnicamente, o array `sourceFields` do conceito. Um conceito pode pertencer a mais de um. **Quatro campos estão em escopo de curadoria:** `comunidades.tipo`, `comunidades.plantas.nomeVernacular`, `comunidades.plantas.tipoUso`, `comunidades.atividadesEconomicas`. `comunidades.plantas.nomeCientifico` aparece só em conceitos históricos, congelados desde 2026-08-10 ([§7.3](07-guia-de-decisao.md#s7-3)). |
 | **Aquisição** | A operação que confronta o BioCultDB com o vocabulário e semeia como `candidate` os termos ainda inexistentes. Roda só sob demanda ([§5.2](05-ciclo-de-vida.md#s5-2)). |
 | **Faceta** | Conceito de 1º nível da árvore, que abre um eixo de significado (`medicinal`, `alimentar`, `ritual e espiritual`…). |
 | **`indeterminado`** | Faceta terminal para termos que não nomeiam uso algum e não têm substituto legítimo ([§5](05-ciclo-de-vida.md#s5)). |
