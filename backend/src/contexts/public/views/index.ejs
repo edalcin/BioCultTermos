@@ -43,32 +43,6 @@
       </div>
     </div>
 
-    <!-- Semantic field cards -->
-    <% if (typeof sourceGroups !== 'undefined' && sourceGroups.length > 0) { %>
-    <h2 class="text-xl font-semibold text-gray-700 mb-4">Campos semânticos</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      <%
-        const FIELD_LABELS = {
-          'comunidades.tipo': 'Tipos de Comunidades',
-          'comunidades.plantas.nomeVernacular': 'Nomes Vernaculares de Plantas',
-          'comunidades.plantas.tipoUso': 'Tipos de Uso de Plantas',
-          'comunidades.atividadesEconomicas': 'Atividades Econômicas'
-        };
-      %>
-      <% sourceGroups.forEach(group => { %>
-      <a href="/concepts?sourceField=<%= encodeURIComponent(group.field) %>"
-         class="bg-white rounded-lg shadow-sm border border-forest-100 p-5
-                hover:border-forest-400 hover:shadow-md transition-all">
-        <div class="text-lg font-semibold text-forest-700 mb-1">
-          <%= FIELD_LABELS[group.field] || group.field %>
-        </div>
-        <div class="text-2xl font-bold text-gray-800"><%= group.count %></div>
-        <div class="text-sm text-gray-500">termos ativos</div>
-      </a>
-      <% }) %>
-    </div>
-    <% } %>
-
     <!-- HTMX search results (initially empty) -->
     <div id="results"></div>
 

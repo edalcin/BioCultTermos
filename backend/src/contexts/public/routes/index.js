@@ -1,32 +1,13 @@
 import { Router } from 'express';
 import path from 'path';
 import { config } from '../../../config/index.js';
-import { CONCEPT_STATUS } from '../../../models/Concept.js';
 import * as ConceptService from '../../../services/ConceptService.js';
 
 const router = Router();
 
 router.get('/', async (req, res, next) => {
-  const db = req.app.locals.db;
-
   try {
-    const sourceFieldsRows = db
-      .prepare(
-        `SELECT DISTINCT je.value AS field FROM etnotermos e, json_each(json_extract(e.doc,'$.sourceFields')) je
-         WHERE json_extract(e.doc,'$.status') = ?`
-      )
-      .all(CONCEPT_STATUS.ACTIVE);
-    const sourceFields = sourceFieldsRows.map((r) => r.field);
-    const total = db
-      .prepare(`SELECT COUNT(*) as n FROM etnotermos WHERE json_extract(doc,'$.status') = ?`)
-      .get(CONCEPT_STATUS.ACTIVE).n;
-
-    res.render('index', {
-      title: 'Início',
-      currentPage: 'home',
-      sourceFields,
-      total,
-    });
+    res.render('index', { title: 'Início', currentPage: 'home' });
   } catch (err) {
     next(err);
   }
