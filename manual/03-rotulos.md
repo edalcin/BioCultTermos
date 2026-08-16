@@ -7,6 +7,12 @@ comum, e é exatamente o que o conhecimento tradicional exige.
 Por quê? Porque *quem* deu o nome, *em que língua*, e *se ele pode ser divulgado* são
 informações tão importantes quanto o nome em si.
 
+> **Referência normativa da arquitetura:** este capítulo é o guia didático. A relação completa dos
+> rótulos SKOS-XL que a arquitetura federada suporta — tipos, metadados, regras consolidadas e
+> exemplos das curadorias reais — está centralizada em
+> [Rótulos SKOS-XL da Arquitetura BioCultural](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/rotulos-skos-xl.md).
+> Divergência entre os dois resolve-se lá.
+
 ### 3.1 Os três tipos de rótulo {#s3-1}
 
 Na tela de edição, seção **"Rótulos (SKOS-XL)"**, ao adicionar um rótulo você escolhe o **Tipo**:

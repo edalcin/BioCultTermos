@@ -14,6 +14,18 @@ opcional, como diziam o ADR-007 F3 e o ADR-010.
 
 ---
 
+## 2026-08-16 — origem: BioCultDB (documentação, sem código)
+
+O manual passa a citar a **referência central dos rótulos SKOS-XL da arquitetura**
+([`Arquitetura-BioCultural/docs/rotulos-skos-xl.md`](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/rotulos-skos-xl.md)),
+documento normativo que consolida tipos de rótulo, metadados, regras e exemplos das curadorias
+reais — divergência entre manual e referência resolve-se lá.
+
+- `manual/index.md`: link acrescentado ao bloco "Padrão de referência".
+- `manual/03-rotulos.md`: nota de referência normativa no topo do capítulo.
+
+---
+
 ## 2026-08-10 — origem: BioCultTermos (mudança de escopo de curadoria)
 
 O Campo Semântico **"Nomes Científicos de Plantas"** (`comunidades.plantas.nomeCientifico`) sai do
