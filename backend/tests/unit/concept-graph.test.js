@@ -116,4 +116,34 @@ describe('buildRelationForest', () => {
 
     expect(ConceptService.buildRelationForest(db).counts.concepts).toBe(2);
   });
+
+  test('sourceField filter drops non-matching concepts, same as status', () => {
+    const parent = insert(makeConcept('medicinal', { sourceFields: ['comunidades.tipo'] }));
+    insert(makeConcept('asma', { broader: [parent.id], sourceFields: ['comunidades.tipo'] }));
+
+    const filtered = ConceptService.buildRelationForest(db, { sourceField: 'comunidades.plantas.tipoUso' });
+    expect(filtered.roots).toEqual([]);
+    expect(filtered.counts.concepts).toBe(0);
+
+    const matching = ConceptService.buildRelationForest(db, { sourceField: 'comunidades.tipo' });
+    expect(matching.roots.map((r) => r.label)).toEqual(['medicinal']);
+    expect(matching.counts.concepts).toBe(2);
+  });
+
+  test('a stale broader cycle at the top of a branch does not hide it — every connected concept still surfaces', () => {
+    // a <-broader- b <-broader- a: neither ever has an empty present(broader),
+    // so the normal rootIds walk never reaches this pair or its descendant.
+    const a = insert(makeConcept('a'));
+    const b = insert(makeConcept('b', { broader: [a.id] }));
+    db.prepare(`UPDATE etnotermos SET doc = json_set(doc,'$.broader', json_array(?)) WHERE id = ?`).run(b.id, a.id);
+    const c = insert(makeConcept('c', { broader: [b.id] }));
+
+    const forest = ConceptService.buildRelationForest(db);
+
+    expect(forest.counts.concepts).toBe(3);
+    const allLabels = new Set();
+    const collect = (nodes) => nodes.forEach((n) => { allLabels.add(n.label); collect(n.children); });
+    collect(forest.roots);
+    expect(allLabels).toEqual(new Set(['a', 'b', 'c']));
+  });
 });

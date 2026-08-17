@@ -27,8 +27,12 @@ router.get('/browse', (req, res, next) => {
 router.get('/graph', (req, res, next) => {
   try {
     const db = req.app.locals.db;
-    const graph = ConceptService.buildRelationForest(db, { status: CONCEPT_STATUS.ACTIVE });
-    res.render('graph', { title: 'Grafo', currentPage: 'graph', graph });
+    const { sourceField } = req.query;
+    const graph = ConceptService.buildRelationForest(db, {
+      status: CONCEPT_STATUS.ACTIVE,
+      sourceField: sourceField || null,
+    });
+    res.render('graph', { title: 'Grafo', currentPage: 'graph', graph, sourceField: sourceField || '' });
   } catch (err) {
     next(err);
   }

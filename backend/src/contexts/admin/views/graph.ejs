@@ -20,9 +20,22 @@
 
   <main class="flex-grow container mx-auto px-4 py-8">
 
-    <div class="mb-6">
-      <h1 class="text-3xl font-bold text-forest-700">Grafo de relações semânticas</h1>
-      <p class="text-gray-600 mt-1">Hierarquia (BT/NT), associações (RT) e sinônimos entre conceitos — clique num conceito para editá-lo</p>
+    <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-forest-700">Grafo de relações semânticas</h1>
+        <p class="text-gray-600 mt-1">Hierarquia (BT/NT), associações (RT) e sinônimos entre conceitos — clique num conceito para editá-lo</p>
+      </div>
+      <form method="GET" action="/graph" class="flex items-center gap-2">
+        <label for="graph-source-field" class="text-sm text-gray-600">Campo Semântico</label>
+        <select id="graph-source-field" name="sourceField" onchange="this.form.submit()"
+                class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-forest-600">
+          <option value="">Todos</option>
+          <option value="comunidades.tipo" <%= sourceField === 'comunidades.tipo' ? 'selected' : '' %>>Tipos de Comunidades</option>
+          <option value="comunidades.plantas.nomeVernacular" <%= sourceField === 'comunidades.plantas.nomeVernacular' ? 'selected' : '' %>>Nomes Vernaculares de Plantas</option>
+          <option value="comunidades.plantas.tipoUso" <%= sourceField === 'comunidades.plantas.tipoUso' ? 'selected' : '' %>>Tipos de Uso de Plantas</option>
+          <option value="comunidades.atividadesEconomicas" <%= sourceField === 'comunidades.atividadesEconomicas' ? 'selected' : '' %>>Atividades Econômicas</option>
+        </select>
+      </form>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">

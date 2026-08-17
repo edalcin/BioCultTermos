@@ -1046,7 +1046,7 @@ export async function updateLabelAccessLevel(db, id, version, labelId, accessLev
  * buildRelationForest. ponytail: O(n) single pass over etnotermos; fine at the
  * scale of a controlled vocabulary (hundreds/thousands of concepts).
  */
-export function findAllWithRelations(db, { status = null } = {}) {
+export function findAllWithRelations(db, { status = null, sourceField = null } = {}) {
   const rows = db.prepare(`SELECT id, doc FROM etnotermos`).all();
   const concepts = rows.map((r) => JSON.parse(r.doc));
 
@@ -1061,6 +1061,7 @@ export function findAllWithRelations(db, { status = null } = {}) {
 
   return concepts
     .filter((c) => status === null || c.status === status)
+    .filter((c) => sourceField === null || (c.sourceFields || []).includes(sourceField))
     .map((c) => ({
       id: c.id,
       prefLabel: labelMap.get(c.id),
@@ -1100,10 +1101,14 @@ export function findAllWithRelations(db, { status = null } = {}) {
  * unconnected roots carry no information; the plain list lives at /browse
  * (public) and /relationships (admin).
  *
+ * `sourceField` restricts the tree to concepts tagged with that entry in
+ * `sourceFields` — same endpoint-removal treatment as `status`: a filtered-out
+ * parent leaves its children as roots instead of a dangling edge.
+ *
  * ponytail: O(n) over etnotermos plus one DFS over the emitted instances.
  */
-export function buildRelationForest(db, { status = null } = {}) {
-  const terms = findAllWithRelations(db, { status });
+export function buildRelationForest(db, { status = null, sourceField = null } = {}) {
+  const terms = findAllWithRelations(db, { status, sourceField });
   const byId = new Map(terms.map((t) => [t.id, t]));
 
   // An endpoint removed by the `status` filter must not produce a phantom
@@ -1193,6 +1198,24 @@ export function buildRelationForest(db, { status = null } = {}) {
     .map((id) => build(id, null, new Set()))
     .filter(Boolean)
     .sort((a, b) => (a.label || '').localeCompare(b.label || ''));
+
+  // Every `broader` edge on a valid write is cycle-checked by addBroader, but
+  // stale/imported data can still contain one (e.g. a top-level facet's
+  // broader was mistakenly pointed at one of its own descendants). Nothing
+  // in that cyclic component has a broader-free entry point, so it would
+  // never be reached by `build()` above and the whole branch — however
+  // large — would silently vanish from the tree while still counting toward
+  // `counts.concepts`. Force every still-unreached connected concept in as a
+  // fallback root so it stays visible (and fixable) instead of disappearing.
+  const strandedRoots = [];
+  for (const id of connected) {
+    if (!emitted.has(id)) {
+      const node = build(id, null, new Set());
+      if (node) strandedRoots.push(node);
+    }
+  }
+  strandedRoots.sort((a, b) => (a.label || '').localeCompare(b.label || ''));
+  roots.push(...strandedRoots);
 
   return {
     roots,

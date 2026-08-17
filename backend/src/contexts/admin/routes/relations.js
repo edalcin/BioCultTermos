@@ -63,8 +63,9 @@ router.get('/relationships', async (req, res, next) => {
 router.get('/graph', async (req, res, next) => {
   try {
     const db = req.app.locals.db;
-    const graph = ConceptService.buildRelationForest(db);
-    res.render('graph', { graph, user: req.user, currentPage: 'graph' });
+    const { sourceField } = req.query;
+    const graph = ConceptService.buildRelationForest(db, { sourceField: sourceField || null });
+    res.render('graph', { graph, user: req.user, currentPage: 'graph', sourceField: sourceField || '' });
   } catch (err) {
     next(err);
   }
