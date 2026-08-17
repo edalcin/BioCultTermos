@@ -27,7 +27,7 @@ router.get('/browse', (req, res, next) => {
 router.get('/graph', (req, res, next) => {
   try {
     const db = req.app.locals.db;
-    const graph = ConceptService.buildRelationGraph(db, { status: CONCEPT_STATUS.ACTIVE });
+    const graph = ConceptService.buildRelationForest(db, { status: CONCEPT_STATUS.ACTIVE });
     res.render('graph', { title: 'Grafo', currentPage: 'graph', graph });
   } catch (err) {
     next(err);

@@ -6,8 +6,8 @@
   <meta name="description" content="BioCultTermos — Grafo de relações semânticas">
   <title>Grafo | BioCultTermos Admin</title>
   <link rel="stylesheet" href="/assets/styles.css">
-  <script src="https://unpkg.com/cytoscape@3.34.1/dist/cytoscape.min.js"
-          integrity="sha384-ynDqnMA1DginJi7wSwU6Ob7MKWUKK2+vwP2WXecQBlvo3hTRXKjKYOWuC1GUuyEy"
+  <script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js"
+          integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i"
           crossorigin="anonymous" defer></script>
   <script src="https://unpkg.com/alpinejs@3.14.9/dist/cdn.min.js"
           integrity="sha384-9Ax3MmS9AClxJyd5/zafcXXjxmwFhZCdsT6HJoJjarvCaAkJlk5QDzjLJm+Wdx5F"
@@ -27,24 +27,24 @@
 
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
-        <div class="text-2xl font-bold text-forest-700"><%= graph.nodes.length %></div>
+        <div class="text-2xl font-bold text-forest-700"><%= graph.counts.concepts %></div>
         <div class="text-sm text-gray-600 mt-1">Conceitos no grafo</div>
       </div>
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
-        <div class="text-2xl font-bold text-blue-600"><%= graph.edges.filter(e => e.rel === 'broader').length %></div>
+        <div class="text-2xl font-bold text-blue-600"><%= graph.counts.broader %></div>
         <div class="text-sm text-gray-600 mt-1">Vínculos BT/NT</div>
       </div>
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
-        <div class="text-2xl font-bold text-forest-600"><%= graph.edges.filter(e => e.rel === 'related').length %></div>
+        <div class="text-2xl font-bold text-forest-600"><%= graph.counts.related %></div>
         <div class="text-sm text-gray-600 mt-1">Vínculos RT</div>
       </div>
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
-        <div class="text-2xl font-bold text-amber-600"><%= graph.edges.filter(e => e.rel === 'synonym').length %></div>
+        <div class="text-2xl font-bold text-amber-600"><%= graph.counts.synonym %></div>
         <div class="text-sm text-gray-600 mt-1">Vínculos Sinônimo</div>
       </div>
     </div>
 
-    <% if (graph.nodes.length === 0) { %>
+    <% if (graph.counts.concepts === 0) { %>
     <div class="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
       Nenhuma relação semântica cadastrada ainda.
       <p class="text-sm mt-2">
@@ -66,15 +66,23 @@
           </span>
         </div>
         <div class="flex items-center gap-2">
+          <button id="graph-expand-all" type="button" class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 text-sm">Expandir tudo</button>
+          <button id="graph-collapse-all" type="button" class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 text-sm">Recolher tudo</button>
           <button id="graph-zoom-out" type="button" aria-label="Diminuir zoom" class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100">−</button>
           <button id="graph-zoom-in" type="button" aria-label="Aumentar zoom" class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100">+</button>
           <button id="graph-fit" type="button" class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 text-sm">Ajustar</button>
         </div>
       </div>
-      <div id="cy" class="h-[70vh]"></div>
+      <% if (graph.truncated) { %>
+      <p class="px-4 py-2 text-xs text-amber-700 bg-amber-50 border-b border-amber-200">
+        Hierarquia muito ramificada: a árvore foi truncada. Use a
+        <a href="/relationships" class="underline">lista em texto</a>.
+      </p>
+      <% } %>
+      <div id="graph-canvas" class="h-[70vh]"></div>
       <script type="application/json" id="graph-data"><%- JSON.stringify(graph).replace(/</g, '\\u003c') %></script>
       <p class="px-4 py-2 text-xs text-gray-500 border-t border-gray-200">
-        Use a roda do mouse ou os botões para dar zoom, arraste para mover, clique num conceito para abrir sua página.
+        Clique no ▸ para abrir os termos mais específicos e no nome do termo para abrir sua página. Arraste para mover, use a roda ou os botões para dar zoom.
         Alternativa em texto: <a href="/relationships" class="text-forest-600 hover:underline">tabela de relacionamentos</a>.
       </p>
     </div>

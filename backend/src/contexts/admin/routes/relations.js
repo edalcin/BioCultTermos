@@ -63,7 +63,7 @@ router.get('/relationships', async (req, res, next) => {
 router.get('/graph', async (req, res, next) => {
   try {
     const db = req.app.locals.db;
-    const graph = ConceptService.buildRelationGraph(db);
+    const graph = ConceptService.buildRelationForest(db);
     res.render('graph', { graph, user: req.user, currentPage: 'graph' });
   } catch (err) {
     next(err);

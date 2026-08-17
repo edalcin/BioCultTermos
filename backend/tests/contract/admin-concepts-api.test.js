@@ -1137,8 +1137,9 @@ describe('Admin Concepts/Labels API', () => {
 
       expect(res.status).toBe(200);
       const payload = JSON.parse(res.text.match(/id="graph-data">([\s\S]*?)<\/script>/)[1]);
-      expect(payload.nodes.map((n) => n.label).sort()).toEqual(['asma', 'medicinal']);
-      expect(payload.edges[0]).toMatchObject({ source: parent.id, target: child.id, rel: 'broader' });
+      expect(payload.roots.map((r) => r.label)).toEqual(['medicinal']);
+      expect(payload.roots[0].children[0]).toMatchObject({ id: child.id, label: 'asma' });
+      expect(payload.counts.concepts).toBe(2);
       expect(res.text).toContain('href="/graph"');
     });
   });

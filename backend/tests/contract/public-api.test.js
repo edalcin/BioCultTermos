@@ -515,10 +515,15 @@ describe('GET /graph', () => {
     const res = await req().get('/graph').expect(200).expect('Content-Type', /html/);
 
     const payload = JSON.parse(res.text.match(/id="graph-data">([\s\S]*?)<\/script>/)[1]);
-    expect(payload.nodes.map((n) => n.label).sort()).toEqual(['asma', 'medicinal']);
-    expect(payload.edges).toEqual([{ id: 'e0', source: parent.id, target: child.id, rel: 'broader' }]);
+    expect(payload.roots.map((r) => r.label)).toEqual(['medicinal']);
+    expect(payload.roots[0].children.map((c) => c.label)).toEqual(['asma']);
+    expect(payload.roots[0].children[0].id).toBe(child.id);
+    expect(payload.counts).toEqual({ concepts: 2, broader: 1, related: 0, synonym: 0 });
+    expect(res.text).toContain('id="graph-canvas"');
     expect(res.text).toContain('id="graph-zoom-in"');
+    expect(res.text).toContain('id="graph-expand-all"');
     expect(res.text).toContain('/assets/shared/graph.js');
+    expect(res.text).toContain('d3@7.9.0');
     expect(res.text).toContain('href="/graph"');
   });
 });

@@ -1043,7 +1043,7 @@ export async function updateLabelAccessLevel(db, id, version, labelId, accessLev
  * Return every concept (optionally narrowed to a single `status`) with its 5
  * semantic relation fields (broader, narrower, related, synonym, synonymFor)
  * resolved to { id, label } pairs — used by the public "Navegar" page and by
- * buildRelationGraph. ponytail: O(n) single pass over etnotermos; fine at the
+ * buildRelationForest. ponytail: O(n) single pass over etnotermos; fine at the
  * scale of a controlled vocabulary (hundreds/thousands of concepts).
  */
 export function findAllWithRelations(db, { status = null } = {}) {
@@ -1078,53 +1078,133 @@ export function findAllWithRelations(db, { status = null } = {}) {
 }
 
 /**
- * Return the semantic relation graph: one node per concept that takes part in at
- * least one BT/RT/synonym relation, and one edge per relation pair.
+ * Return the BT/NT hierarchy as a forest of display instances, plus the
+ * RT/synonym pairs a tree cannot express, plus the headline counts.
  *
- * Isolated concepts are omitted on purpose — a relation graph made of thousands
- * of unconnected dots is unreadable and carries no information; the plain list
- * lives at /browse (public) and /relationships (admin).
+ * Why a forest instead of a flat node/edge list: on real data this vocabulary
+ * is ~10 facets over ~320 concepts with a documented max depth of 4, and a
+ * node-link layout puts every same-depth concept on one row, so labels overlap
+ * into an unreadable smear. A tidy tree gives every visible concept its own
+ * row, so labels cannot collide.
+ *
+ * The hierarchy is a DAG, not a tree: addBroader pushes onto an array, so a
+ * concept may sit under several parents. Such a concept is emitted once under
+ * each parent — what taxonomy browsers do — with `dup: true` on every instance
+ * after the first, and `key` disambiguating the instances.
  *
  * `narrower` and `synonymFor` are deliberately NOT walked: addBroader/addSynonym
- * always write them as the reciprocal of `broader`/`synonym`, so walking both
- * sides would draw every edge twice.
+ * write them as the reciprocal of `broader`/`synonym`, so walking both sides
+ * would double every relation.
  *
- * ponytail: O(n) over etnotermos, one pass on top of findAllWithRelations.
+ * Concepts with no relation at all stay out, as before — thousands of
+ * unconnected roots carry no information; the plain list lives at /browse
+ * (public) and /relationships (admin).
+ *
+ * ponytail: O(n) over etnotermos plus one DFS over the emitted instances.
  */
-export function buildRelationGraph(db, { status = null } = {}) {
+export function buildRelationForest(db, { status = null } = {}) {
   const terms = findAllWithRelations(db, { status });
   const byId = new Map(terms.map((t) => [t.id, t]));
-  const edges = [];
-  const seen = new Set();
-  const connected = new Set();
 
-  // An endpoint removed by the `status` filter (e.g. a candidate parent of an
-  // active child on the public graph) would leave an edge pointing at a missing
-  // node, which Cytoscape refuses to load — drop the edge instead.
-  const addEdge = (rel, source, target) => {
-    if (!byId.has(source) || !byId.has(target)) return;
-    const key =
-      rel === 'related' ? `related|${[source, target].sort().join('|')}` : `${rel}|${source}|${target}`;
-    if (seen.has(key)) return;
-    seen.add(key);
-    edges.push({ id: `e${edges.length}`, source, target, rel });
-    connected.add(source);
-    connected.add(target);
-  };
+  // An endpoint removed by the `status` filter must not produce a phantom
+  // parent or a link to a node that is not in the payload.
+  const present = (list) => list.filter((r) => byId.has(r.id));
+
+  const broaderPairs = new Set();
+  const crossSeen = new Set();
+  const crossLinks = [];
 
   for (const t of terms) {
-    // Direction is parent → child so Cytoscape's directed breadthfirst layout
-    // puts broader concepts on top, matching the trees drawn in manual §6.1.
-    t.relations.broader.forEach((p) => addEdge('broader', p.id, t.id));
-    t.relations.related.forEach((r) => addEdge('related', t.id, r.id));
-    t.relations.synonym.forEach((s) => addEdge('synonym', t.id, s.id));
+    for (const p of present(t.relations.broader)) broaderPairs.add(`${p.id}|${t.id}`);
+
+    for (const r of present(t.relations.related)) {
+      const key = `related|${[t.id, r.id].sort().join('|')}`;
+      if (crossSeen.has(key)) continue;
+      crossSeen.add(key);
+      crossLinks.push({ source: t.id, target: r.id, rel: 'related' });
+    }
+
+    for (const s of present(t.relations.synonym)) {
+      const key = `synonym|${t.id}|${s.id}`;
+      if (crossSeen.has(key)) continue;
+      crossSeen.add(key);
+      crossLinks.push({ source: t.id, target: s.id, rel: 'synonym' });
+    }
   }
 
-  const nodes = terms
-    .filter((t) => connected.has(t.id))
-    .map((t) => ({ id: t.id, label: t.prefLabel, status: t.status }));
+  const childrenOf = new Map();
+  for (const t of terms) {
+    for (const p of present(t.relations.broader)) {
+      if (!childrenOf.has(p.id)) childrenOf.set(p.id, []);
+      childrenOf.get(p.id).push(t.id);
+    }
+  }
 
-  return { nodes, edges };
+  const connected = new Set();
+  for (const pair of broaderPairs) {
+    const [parentId, childId] = pair.split('|');
+    connected.add(parentId);
+    connected.add(childId);
+  }
+  for (const l of crossLinks) {
+    connected.add(l.source);
+    connected.add(l.target);
+  }
+
+  // A concept whose only parents were filtered out has no parent left inside
+  // the payload, so it surfaces as a root — same intent as dropping a dangling
+  // edge. A concept linked only by RT/synonym is a childless root and still
+  // shows up, so its association can be drawn.
+  const rootIds = terms
+    .filter((t) => connected.has(t.id) && present(t.relations.broader).length === 0)
+    .map((t) => t.id);
+
+  const emitted = new Set();
+  const MAX_INSTANCES = 5000;
+  let instances = 0;
+  let truncated = false;
+
+  const build = (id, parentKey, path) => {
+    if (instances >= MAX_INSTANCES) {
+      truncated = true;
+      return null;
+    }
+    instances += 1;
+
+    const term = byId.get(id);
+    const key = parentKey ? `${parentKey}>${id}` : id;
+    const dup = emitted.has(id);
+    emitted.add(id);
+
+    const nextPath = new Set(path);
+    nextPath.add(id);
+
+    const children = (childrenOf.get(id) || [])
+      // addBroader rejects cycles, but stale data must never hang the page.
+      .filter((childId) => !nextPath.has(childId))
+      .map((childId) => build(childId, key, nextPath))
+      .filter(Boolean)
+      .sort((a, b) => (a.label || '').localeCompare(b.label || ''));
+
+    return { key, id, label: term.prefLabel, status: term.status, dup, children };
+  };
+
+  const roots = rootIds
+    .map((id) => build(id, null, new Set()))
+    .filter(Boolean)
+    .sort((a, b) => (a.label || '').localeCompare(b.label || ''));
+
+  return {
+    roots,
+    crossLinks,
+    truncated,
+    counts: {
+      concepts: connected.size,
+      broader: broaderPairs.size,
+      related: crossLinks.filter((l) => l.rel === 'related').length,
+      synonym: crossLinks.filter((l) => l.rel === 'synonym').length,
+    },
+  };
 }
 
 /**
@@ -1148,4 +1228,4 @@ export function findIdByExactPrefLabel(db, literalForm) {
   return row ? row.id : null;
 }
 
-export default { findMany, findById, updateNotes, activate, deprecate, addLabel, updateLabel, promoteLabel, updateLabelAccessLevel, removeLabel, saveAudio, removeAudio, addBroader, removeBroader, addRelated, removeRelated, addSynonym, removeSynonym, removeSynonymFor, findAllWithRelations, buildRelationGraph, findIdByExactPrefLabel };
+export default { findMany, findById, updateNotes, activate, deprecate, addLabel, updateLabel, promoteLabel, updateLabelAccessLevel, removeLabel, saveAudio, removeAudio, addBroader, removeBroader, addRelated, removeRelated, addSynonym, removeSynonym, removeSynonymFor, findAllWithRelations, buildRelationForest, findIdByExactPrefLabel };
