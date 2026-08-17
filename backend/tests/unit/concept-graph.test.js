@@ -147,3 +147,76 @@ describe('buildRelationForest', () => {
     expect(allLabels).toEqual(new Set(['a', 'b', 'c']));
   });
 });
+
+describe('buildRelationForest publicOnly (CARE)', () => {
+  test('omits a concept whose only prefLabel is sacred, including as a sibling relation label', () => {
+    const sacredParent = insert(
+      makeConcept('nome-sagrado', {
+        prefLabels: [
+          { id: randomUUID(), literalForm: 'nome-sagrado', language: 'pt', type: 'pref', accessLevel: 'sacred', labelRelations: [] },
+        ],
+      })
+    );
+    // related keeps the child connected once its broader (sacred) parent is
+    // filtered out, so the leak check exercises a populated payload rather
+    // than an empty one.
+    const sibling = insert(makeConcept('planta-companheira'));
+    const child = insert(makeConcept('remedio-publico', { broader: [sacredParent.id], related: [sibling.id] }));
+    db.prepare(`UPDATE etnotermos SET doc = json_set(doc,'$.related', json_array(?)) WHERE id = ?`).run(
+      child.id,
+      sibling.id
+    );
+
+    const forest = ConceptService.buildRelationForest(db, { publicOnly: true });
+
+    expect(JSON.stringify(forest)).not.toContain('nome-sagrado');
+    // child loses its only parent (filtered out), so it surfaces as a childless root.
+    expect(forest.roots.map((r) => r.label).sort()).toEqual(['planta-companheira', 'remedio-publico']);
+    expect(forest.roots.find((r) => r.label === 'remedio-publico').children).toEqual([]);
+    expect(forest.counts.concepts).toBe(2);
+  });
+
+  test('keeps public altLabels and drops sacred/restricted ones', () => {
+    insert(
+      makeConcept('planta', {
+        broader: [insert(makeConcept('categoria')).id],
+        altLabels: [
+          { id: randomUUID(), literalForm: 'nome-publico-alt', language: 'pt', type: 'alt', accessLevel: 'public', labelRelations: [] },
+          { id: randomUUID(), literalForm: 'nome-restrito-alt', language: 'pt', type: 'alt', accessLevel: 'restricted', labelRelations: [] },
+        ],
+      })
+    );
+
+    const forest = ConceptService.buildRelationForest(db, { publicOnly: true });
+
+    const planta = forest.roots.flatMap((r) => [r, ...r.children]).find((n) => n.label === 'planta');
+    expect(planta.altLabels).toEqual(['nome-publico-alt']);
+  });
+
+  test('without publicOnly (admin default) both public and non-public altLabels appear', () => {
+    insert(
+      makeConcept('planta', {
+        broader: [insert(makeConcept('categoria')).id],
+        altLabels: [
+          { id: randomUUID(), literalForm: 'nome-publico-alt', language: 'pt', type: 'alt', accessLevel: 'public', labelRelations: [] },
+          { id: randomUUID(), literalForm: 'nome-restrito-alt', language: 'pt', type: 'alt', accessLevel: 'restricted', labelRelations: [] },
+        ],
+      })
+    );
+
+    const forest = ConceptService.buildRelationForest(db);
+
+    const planta = forest.roots.flatMap((r) => [r, ...r.children]).find((n) => n.label === 'planta');
+    expect(planta.altLabels).toEqual(['nome-publico-alt', 'nome-restrito-alt']);
+  });
+
+  test('every forest node carries altLabels as an array of strings', () => {
+    const parent = insert(makeConcept('medicinal'));
+    insert(makeConcept('asma', { broader: [parent.id] }));
+
+    const forest = ConceptService.buildRelationForest(db);
+
+    expect(forest.roots[0].altLabels).toEqual([]);
+    expect(forest.roots[0].children[0].altLabels).toEqual([]);
+  });
+});

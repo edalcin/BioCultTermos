@@ -161,6 +161,9 @@
     node
       .select('text.label')
       .attr('font-style', (d) => (d.data.dup ? 'italic' : 'normal'))
+      .attr('style', (d) => ((d.data.altLabels || []).length
+        ? 'text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px;'
+        : null))
       .text((d) => {
         const collapsed = !d.children && d._children ? ` (${d._children.length})` : '';
         const hidden = hiddenCross.get(conceptId(d));
@@ -168,12 +171,16 @@
       });
 
     node.select('title').text((d) => {
-      const lines = [d.data.label, 'status: ' + d.data.status];
+      const lines = [d.data.label];
+      const alt = d.data.altLabels || [];
+      if (alt.length) lines.push('Nomes alternativos: ' + alt.join(', '));
+      lines.push('status: ' + d.data.status);
       if (d.data.dup) lines.push('repetido — conceito com mais de um termo mais amplo');
       const hidden = hiddenCross.get(conceptId(d));
       if (hidden) lines.push(hidden + ' associação(ões) com conceito fora da vista');
       return lines.join('\n');
     });
+
   }
 
   function toggle(d) {
@@ -225,6 +232,50 @@
     svg.call(zoom.scaleBy, factor);
   }
 
+  // Exportação: a árvore já é SVG, então a rasterização usa só APIs do browser —
+  // nenhuma dependência. `blob:` NÃO está em img-src na CSP de nenhum dos dois
+  // contextos (public/server.js:18 e admin/server.js:32 permitem 'self', data:,
+  // https:), por isso tanto a origem do <img> quanto o href do download são data:.
+  const MAX_PX = 16384; // teto de dimensão de canvas; árvore de 300+ nós expandida dá ~8500px de altura
+
+  function exportName(ext) {
+    return `grafo-relacoes-semanticas-${new Date().toISOString().slice(0, 10)}.${ext}`;
+  }
+
+  // Rasteriza a árvore inteira no tamanho natural, ignorando o zoom/pan atual, e
+  // no estado de expansão que está na tela (o que está recolhido não sai na imagem).
+  function toPngDataUrl(callback) {
+    const box = viewport.node().getBBox();
+    if (!box.width || !box.height) return; // mesma guarda de fit()
+    const w = Math.ceil(box.width + PAD * 2);
+    const h = Math.ceil(box.height + PAD * 2);
+    // Sem o teto, uma árvore alta estoura o limite de canvas e o PNG sai em branco.
+    const scale = Math.min(2, MAX_PX / Math.max(w, h));
+
+    const clone = svg.node().cloneNode(true);
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    clone.setAttribute('width', w);
+    clone.setAttribute('height', h);
+    clone.setAttribute('viewBox', `${box.x - PAD} ${box.y - PAD} ${w} ${h}`);
+    // getBBox() já vem sem o transform do próprio grupo, e o viewBox acima enquadra
+    // a árvore — manter o transform de pan/zoom deslocaria tudo para fora.
+    clone.querySelector('g').removeAttribute('transform');
+
+    const xml = new XMLSerializer().serializeToString(clone);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.ceil(w * scale);
+      canvas.height = Math.ceil(h * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff'; // canvas nasce transparente; PNG sem fundo fica ilegível
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      callback(canvas.toDataURL('image/png'));
+    };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
+  }
+
   const on = (id, handler) => document.getElementById(id)?.addEventListener('click', handler);
   on('graph-zoom-in', () => zoomBy(1.3));
   on('graph-zoom-out', () => zoomBy(1 / 1.3));
@@ -236,6 +287,31 @@
   on('graph-collapse-all', () => {
     setAll(false);
     fit();
+  });
+  on('graph-export-png', () => {
+    toPngDataUrl((dataUrl) => {
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = exportName('png');
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+  });
+
+  on('graph-export-pdf', () => {
+    // A janela tem de ser aberta de forma síncrona dentro do handler de clique,
+    // ANTES da rasterização assíncrona, senão o bloqueador de pop-up a mata.
+    const win = window.open('', '_blank');
+    if (!win) return;
+    toPngDataUrl((dataUrl) => {
+      win.document.write(
+        '<!doctype html><title>' + exportName('pdf') + '</title>' +
+        '<style>@page{margin:10mm}html,body{margin:0}img{width:100%}</style>' +
+        '<img src="' + dataUrl + '" onload="window.focus();window.print()">'
+      );
+      win.document.close();
+    });
   });
 
   update();

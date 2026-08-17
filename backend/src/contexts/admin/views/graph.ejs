@@ -84,6 +84,8 @@
           <button id="graph-zoom-out" type="button" aria-label="Diminuir zoom" class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100">−</button>
           <button id="graph-zoom-in" type="button" aria-label="Aumentar zoom" class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100">+</button>
           <button id="graph-fit" type="button" class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 text-sm">Ajustar</button>
+          <button id="graph-export-png" type="button" class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 text-sm">PNG</button>
+          <button id="graph-export-pdf" type="button" class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 text-sm">PDF</button>
         </div>
       </div>
       <% if (graph.truncated) { %>
@@ -96,6 +98,7 @@
       <script type="application/json" id="graph-data"><%- JSON.stringify(graph).replace(/</g, '\\u003c') %></script>
       <p class="px-4 py-2 text-xs text-gray-500 border-t border-gray-200">
         Clique no ▸ para abrir os termos mais específicos e no nome do termo para abrir sua página. Arraste para mover, use a roda ou os botões para dar zoom.
+        Termos sublinhados têm nomes alternativos — passe o mouse para vê-los.
         Alternativa em texto: <a href="/relationships" class="text-forest-600 hover:underline">tabela de relacionamentos</a>.
       </p>
     </div>

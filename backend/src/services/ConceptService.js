@@ -1046,12 +1046,27 @@ export async function updateLabelAccessLevel(db, id, version, labelId, accessLev
  * buildRelationForest. ponytail: O(n) single pass over etnotermos; fine at the
  * scale of a controlled vocabulary (hundreds/thousands of concepts).
  */
-export function findAllWithRelations(db, { status = null, sourceField = null } = {}) {
+export function findAllWithRelations(db, { status = null, sourceField = null, publicOnly = false } = {}) {
   const rows = db.prepare(`SELECT id, doc FROM etnotermos`).all();
   const concepts = rows.map((r) => JSON.parse(r.doc));
 
+  const isPublicLabel = (l) => l.accessLevel === ACCESS_LEVEL.PUBLIC;
+
+  // CARE (docs/care-compliance.md): um conceito cujo prefLabel é sacred/restricted
+  // não pode aparecer publicamente de forma alguma — nem como rótulo de relação de
+  // outro conceito — por isso sai antes de labelMap ser montado, que é justamente
+  // o mapa que resolve nome de relação.
+  const visible = publicOnly
+    ? concepts.filter((c) => (c.prefLabels ?? []).some(isPublicLabel))
+    : concepts;
+
+  const pickLabels = (list) => (publicOnly ? (list ?? []).filter(isPublicLabel) : (list ?? []));
+
   const labelMap = new Map(
-    concepts.map((c) => [c.id, (c.prefLabels && c.prefLabels[0]) ? c.prefLabels[0].literalForm : c.id])
+    visible.map((c) => {
+      const pref = pickLabels(c.prefLabels)[0];
+      return [c.id, pref ? pref.literalForm : c.id];
+    })
   );
 
   const toRelList = (ids) =>
@@ -1059,7 +1074,7 @@ export function findAllWithRelations(db, { status = null, sourceField = null } =
       .filter((id) => labelMap.has(id))
       .map((id) => ({ id, label: labelMap.get(id) }));
 
-  return concepts
+  return visible
     .filter((c) => status === null || c.status === status)
     .filter((c) => sourceField === null || (c.sourceFields || []).includes(sourceField))
     .map((c) => ({
@@ -1067,6 +1082,7 @@ export function findAllWithRelations(db, { status = null, sourceField = null } =
       prefLabel: labelMap.get(c.id),
       status: c.status,
       sourceFields: c.sourceFields || [],
+      altLabels: pickLabels(c.altLabels).map((l) => l.literalForm),
       relations: {
         broader: toRelList(c.broader),
         narrower: toRelList(c.narrower),
@@ -1105,10 +1121,13 @@ export function findAllWithRelations(db, { status = null, sourceField = null } =
  * `sourceFields` — same endpoint-removal treatment as `status`: a filtered-out
  * parent leaves its children as roots instead of a dangling edge.
  *
+ * `publicOnly` restringe a `accessLevel: 'public'` e omite conceito sem
+ * `prefLabel` público, por CARE.
+ *
  * ponytail: O(n) over etnotermos plus one DFS over the emitted instances.
  */
-export function buildRelationForest(db, { status = null, sourceField = null } = {}) {
-  const terms = findAllWithRelations(db, { status, sourceField });
+export function buildRelationForest(db, { status = null, sourceField = null, publicOnly = false } = {}) {
+  const terms = findAllWithRelations(db, { status, sourceField, publicOnly });
   const byId = new Map(terms.map((t) => [t.id, t]));
 
   // An endpoint removed by the `status` filter must not produce a phantom
@@ -1191,7 +1210,7 @@ export function buildRelationForest(db, { status = null, sourceField = null } = 
       .filter(Boolean)
       .sort((a, b) => (a.label || '').localeCompare(b.label || ''));
 
-    return { key, id, label: term.prefLabel, status: term.status, dup, children };
+    return { key, id, label: term.prefLabel, status: term.status, dup, altLabels: term.altLabels, children };
   };
 
   const roots = rootIds

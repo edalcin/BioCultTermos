@@ -17,7 +17,7 @@ router.get('/', async (req, res, next) => {
 router.get('/browse', (req, res, next) => {
   try {
     const db = req.app.locals.db;
-    const terms = ConceptService.findAllWithRelations(db, { status: CONCEPT_STATUS.ACTIVE });
+    const terms = ConceptService.findAllWithRelations(db, { status: CONCEPT_STATUS.ACTIVE, publicOnly: true });
     res.render('browse', { title: 'Navegar', currentPage: 'browse', terms });
   } catch (err) {
     next(err);
@@ -31,6 +31,7 @@ router.get('/graph', (req, res, next) => {
     const graph = ConceptService.buildRelationForest(db, {
       status: CONCEPT_STATUS.ACTIVE,
       sourceField: sourceField || null,
+      publicOnly: true,
     });
     res.render('graph', { title: 'Grafo', currentPage: 'graph', graph, sourceField: sourceField || '' });
   } catch (err) {
