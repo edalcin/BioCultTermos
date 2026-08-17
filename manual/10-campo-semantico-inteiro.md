@@ -11,10 +11,10 @@ caminho do campo de origem no registro do BioCultDB. Distribuição real hoje:
 
 | `sourceFields` | Conceitos |
 |---|---:|
-| `comunidades.plantas.nomeVernacular` | 982 |
+| `comunidades.plantas.nomeVernacular` | 983 |
 | ~~`comunidades.plantas.nomeCientifico`~~ | ~~864~~ — **removido do vocabulário em 2026-08-10** |
-| `comunidades.plantas.tipoUso` | **713, já curado** |
-| `comunidades.atividadesEconomicas` | 36 |
+| `comunidades.plantas.tipoUso` | **744, curado** em 2026-08-07 (15 termos novos aguardam passada incremental) |
+| `comunidades.atividadesEconomicas` | **42, curado** em 2026-08-17 |
 | `comunidades.tipo` | 9 |
 
 > **`comunidades.plantas.nomeCientifico` saiu do escopo de curadoria em 2026-08-10.** Não existe
@@ -94,6 +94,28 @@ nota de escopo prescrita em [§3.5](03-rotulos.md#s3-5) e da regra de ouro de
 **`nomeCientifico` deixou de ser conceito neste vocabulário** — a questão da fusão com
 `nomeVernacular` não se coloca mais aqui; ver [§7.3](07-guia-de-decisao.md#s7-3).
 
+**Nem todo campo tem o problema do `tipoUso`.** A segunda campanha, "Atividades Econômicas"
+(2026-08-17, 36 termos), chegou **sem** sujeira: zero plural, zero grafia incorreta, zero termo em
+inglês, zero variante de regência — e por isso zero rótulo `alt`. O trabalho ali foi outro:
+**granularidade desigual** (`agricultura`, 21 ocorrências, ao lado de `cultivo de batata-doce`, 1,
+sem nada que os ligasse) e dois padrões novos, que valem para os próximos campos:
+
+- **Termo de categoria errada.** `lavrador`, `dona de casa` e `estudante` são *ocupações* num campo
+  de *atividades*. A regra que saiu daí: se a ocupação **nomeia** uma atividade que existe no
+  vocabulário, ela vira rótulo **oculto** dessa atividade e o conceito de origem é depreciado
+  apontando-a (`lavrador` → `agricultura`); se **não nomeia atividade alguma**, é depreciação
+  simples para `indeterminado`, **sem** rótulo — pôr `estudante` como rótulo de `indeterminado`
+  afirmaria equivalência falsa.
+- **Conceito compartilhado entre campos.** `pesca` e `artesanato` já existiam sob
+  `material e tecnológico`, onde significam *planta empregada na pesca / em artesanato*; no campo
+  econômico significam *meio de vida*. Não se cria conceito homônimo (a aquisição casa por
+  `literalForm` e o segundo ficaria inalcançável): dá-se um **segundo `broader`** na faceta do novo
+  campo, com nota de escopo registrando as duas leituras. E os filhos puramente do novo campo pendem
+  da **faceta**, não do conceito compartilhado, para não herdar a faceta alheia em `ancestors`.
+
+> **`indeterminado` é compartilhado por todos os campos.** Foi criado na campanha do `tipoUso` e
+> generalizado em 2026-08-17 para servir a qualquer Campo Semântico. Não crie um por campo.
+
 ## 10.6 O que ficou em aberto na campanha dos tipos de uso {#s10-6}
 
 Dívida declarada, não escondida:
@@ -105,5 +127,9 @@ Dívida declarada, não escondida:
 - **Nenhuma relação RT foi criada** — o plano não as previa. `gripe` ↔ `resfriado` é o caso óbvio
   a considerar numa próxima passada.
 
-O registro completo da campanha está em
-[`docs/curadoria/tipos-de-uso`](https://github.com/edalcin/BioCultDB/tree/main/docs/curadoria/tipos-de-uso).
+O registro completo das campanhas está em
+[`docs/curadoria/tipos-de-uso`](https://github.com/edalcin/BioCultDB/tree/main/docs/curadoria/tipos-de-uso)
+e [`docs/curadoria/atividades-economicas`](https://github.com/edalcin/BioCultDB/tree/main/docs/curadoria/atividades-economicas).
+O **método genérico**, com os scripts idempotentes e o esquema do plano, está no
+[runbook de curadoria de Campo Semântico](https://github.com/edalcin/BioCultDB/blob/main/docs/curadoria/runbook-campo-semantico.md)
+— é por ele que se começa a próxima campanha, ou uma passada incremental sobre campo já curado.
