@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="BioCultTermos — Grafo de relações semânticas">
+  <title>Grafo | BioCultTermos Admin</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="https://unpkg.com/cytoscape@3.34.1/dist/cytoscape.min.js"
+          integrity="sha384-ynDqnMA1DginJi7wSwU6Ob7MKWUKK2+vwP2WXecQBlvo3hTRXKjKYOWuC1GUuyEy"
+          crossorigin="anonymous" defer></script>
+  <script src="https://unpkg.com/alpinejs@3.14.9/dist/cdn.min.js"
+          integrity="sha384-9Ax3MmS9AClxJyd5/zafcXXjxmwFhZCdsT6HJoJjarvCaAkJlk5QDzjLJm+Wdx5F"
+          crossorigin="anonymous" defer></script>
+  <script src="/assets/shared/graph.js" defer></script>
+</head>
+<body class="bg-forest-50 min-h-screen flex flex-col">
+
+  <%- include('partials/header') %>
+
+  <main class="flex-grow container mx-auto px-4 py-8">
+
+    <div class="mb-6">
+      <h1 class="text-3xl font-bold text-forest-700">Grafo de relações semânticas</h1>
+      <p class="text-gray-600 mt-1">Hierarquia (BT/NT), associações (RT) e sinônimos entre conceitos — clique num conceito para editá-lo</p>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+        <div class="text-2xl font-bold text-forest-700"><%= graph.nodes.length %></div>
+        <div class="text-sm text-gray-600 mt-1">Conceitos no grafo</div>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+        <div class="text-2xl font-bold text-blue-600"><%= graph.edges.filter(e => e.rel === 'broader').length %></div>
+        <div class="text-sm text-gray-600 mt-1">Vínculos BT/NT</div>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+        <div class="text-2xl font-bold text-forest-600"><%= graph.edges.filter(e => e.rel === 'related').length %></div>
+        <div class="text-sm text-gray-600 mt-1">Vínculos RT</div>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 text-center">
+        <div class="text-2xl font-bold text-amber-600"><%= graph.edges.filter(e => e.rel === 'synonym').length %></div>
+        <div class="text-sm text-gray-600 mt-1">Vínculos Sinônimo</div>
+      </div>
+    </div>
+
+    <% if (graph.nodes.length === 0) { %>
+    <div class="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+      Nenhuma relação semântica cadastrada ainda.
+      <p class="text-sm mt-2">
+        <a href="/concepts" class="text-forest-600 hover:underline">Editar um conceito e adicionar relações →</a>
+      </p>
+    </div>
+    <% } else { %>
+
+    <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+      <div class="px-4 py-3 border-b border-gray-200 bg-gray-50 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+          <span class="flex items-center gap-2"><span class="inline-block w-6 border-t-2 border-blue-400"></span> Mais amplo → Mais específico (BT/NT)</span>
+          <span class="flex items-center gap-2"><span class="inline-block w-6 border-t-2 border-dashed border-forest-600"></span> Relacionado (RT)</span>
+          <span class="flex items-center gap-2"><span class="inline-block w-6 border-t-2 border-dotted border-amber-600"></span> Sinônimo de (aceito)</span>
+          <span class="flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-forest-600"></span> ativo
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-yellow-600 ml-2"></span> candidato
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-gray-400 ml-2"></span> depreciado
+          </span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="graph-zoom-out" type="button" aria-label="Diminuir zoom" class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100">−</button>
+          <button id="graph-zoom-in" type="button" aria-label="Aumentar zoom" class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100">+</button>
+          <button id="graph-fit" type="button" class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 text-sm">Ajustar</button>
+        </div>
+      </div>
+      <div id="cy" class="h-[70vh]"></div>
+      <script type="application/json" id="graph-data"><%- JSON.stringify(graph).replace(/</g, '\\u003c') %></script>
+      <p class="px-4 py-2 text-xs text-gray-500 border-t border-gray-200">
+        Use a roda do mouse ou os botões para dar zoom, arraste para mover, clique num conceito para abrir sua página.
+        Alternativa em texto: <a href="/relationships" class="text-forest-600 hover:underline">tabela de relacionamentos</a>.
+      </p>
+    </div>
+
+    <% } %>
+
+  </main>
+
+  <%- include('partials/footer') %>
+
+</body>
+</html>

@@ -495,3 +495,30 @@ describe('Error response shapes', () => {
     expect(res.body).toHaveProperty('message');
   });
 });
+
+// ---------------------------------------------------------------------------
+// GET /graph
+// ---------------------------------------------------------------------------
+
+describe('GET /graph', () => {
+  test('embeds the active-only relation graph and the zoom controls', async () => {
+    if (!serverAvailable) return;
+
+    const label = (literalForm) => [
+      { id: randomUUID(), literalForm, language: 'pt', type: 'pref', accessLevel: 'public' },
+    ];
+    const parent = makeConcept({ prefLabels: label('medicinal') });
+    const child = makeConcept({ broader: [parent.id], prefLabels: label('asma') });
+    const orphan = makeConcept({ prefLabels: label('mutirão') });
+    insertConceptRows([parent, child, orphan]);
+
+    const res = await req().get('/graph').expect(200).expect('Content-Type', /html/);
+
+    const payload = JSON.parse(res.text.match(/id="graph-data">([\s\S]*?)<\/script>/)[1]);
+    expect(payload.nodes.map((n) => n.label).sort()).toEqual(['asma', 'medicinal']);
+    expect(payload.edges).toEqual([{ id: 'e0', source: parent.id, target: child.id, rel: 'broader' }]);
+    expect(res.text).toContain('id="graph-zoom-in"');
+    expect(res.text).toContain('/assets/shared/graph.js');
+    expect(res.text).toContain('href="/graph"');
+  });
+});

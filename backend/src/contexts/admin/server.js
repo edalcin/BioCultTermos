@@ -41,6 +41,7 @@ export function createApp(db) {
   app.use(express.json());
   app.use(requestLogger);
 
+  app.use('/assets/shared', express.static(path.join(__dirname, '..', '..', 'shared', 'assets')));
   app.use('/assets', express.static(path.join(__dirname, 'views', 'assets')));
 
   app.set('view engine', 'ejs');

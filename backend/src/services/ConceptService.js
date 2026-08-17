@@ -1040,13 +1040,13 @@ export async function updateLabelAccessLevel(db, id, version, labelId, accessLev
 }
 
 /**
- * Return every active concept with its 5 semantic relation fields (broader,
- * narrower, related, synonym, synonymFor) resolved to { id, label } pairs —
- * used by the public "Navegar" page to list the whole controlled vocabulary
- * in one pass. ponytail: O(n) single pass over etnotermos; fine at the scale
- * of a controlled vocabulary (hundreds/thousands of concepts).
+ * Return every concept (optionally narrowed to a single `status`) with its 5
+ * semantic relation fields (broader, narrower, related, synonym, synonymFor)
+ * resolved to { id, label } pairs — used by the public "Navegar" page and by
+ * buildRelationGraph. ponytail: O(n) single pass over etnotermos; fine at the
+ * scale of a controlled vocabulary (hundreds/thousands of concepts).
  */
-export function findAllActiveWithRelations(db) {
+export function findAllWithRelations(db, { status = null } = {}) {
   const rows = db.prepare(`SELECT id, doc FROM etnotermos`).all();
   const concepts = rows.map((r) => JSON.parse(r.doc));
 
@@ -1060,10 +1060,11 @@ export function findAllActiveWithRelations(db) {
       .map((id) => ({ id, label: labelMap.get(id) }));
 
   return concepts
-    .filter((c) => c.status === CONCEPT_STATUS.ACTIVE)
+    .filter((c) => status === null || c.status === status)
     .map((c) => ({
       id: c.id,
       prefLabel: labelMap.get(c.id),
+      status: c.status,
       sourceFields: c.sourceFields || [],
       relations: {
         broader: toRelList(c.broader),
@@ -1074,6 +1075,56 @@ export function findAllActiveWithRelations(db) {
       },
     }))
     .sort((a, b) => (a.prefLabel || '').localeCompare(b.prefLabel || ''));
+}
+
+/**
+ * Return the semantic relation graph: one node per concept that takes part in at
+ * least one BT/RT/synonym relation, and one edge per relation pair.
+ *
+ * Isolated concepts are omitted on purpose — a relation graph made of thousands
+ * of unconnected dots is unreadable and carries no information; the plain list
+ * lives at /browse (public) and /relationships (admin).
+ *
+ * `narrower` and `synonymFor` are deliberately NOT walked: addBroader/addSynonym
+ * always write them as the reciprocal of `broader`/`synonym`, so walking both
+ * sides would draw every edge twice.
+ *
+ * ponytail: O(n) over etnotermos, one pass on top of findAllWithRelations.
+ */
+export function buildRelationGraph(db, { status = null } = {}) {
+  const terms = findAllWithRelations(db, { status });
+  const byId = new Map(terms.map((t) => [t.id, t]));
+  const edges = [];
+  const seen = new Set();
+  const connected = new Set();
+
+  // An endpoint removed by the `status` filter (e.g. a candidate parent of an
+  // active child on the public graph) would leave an edge pointing at a missing
+  // node, which Cytoscape refuses to load — drop the edge instead.
+  const addEdge = (rel, source, target) => {
+    if (!byId.has(source) || !byId.has(target)) return;
+    const key =
+      rel === 'related' ? `related|${[source, target].sort().join('|')}` : `${rel}|${source}|${target}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    edges.push({ id: `e${edges.length}`, source, target, rel });
+    connected.add(source);
+    connected.add(target);
+  };
+
+  for (const t of terms) {
+    // Direction is parent → child so Cytoscape's directed breadthfirst layout
+    // puts broader concepts on top, matching the trees drawn in manual §6.1.
+    t.relations.broader.forEach((p) => addEdge('broader', p.id, t.id));
+    t.relations.related.forEach((r) => addEdge('related', t.id, r.id));
+    t.relations.synonym.forEach((s) => addEdge('synonym', t.id, s.id));
+  }
+
+  const nodes = terms
+    .filter((t) => connected.has(t.id))
+    .map((t) => ({ id: t.id, label: t.prefLabel, status: t.status }));
+
+  return { nodes, edges };
 }
 
 /**
@@ -1097,4 +1148,4 @@ export function findIdByExactPrefLabel(db, literalForm) {
   return row ? row.id : null;
 }
 
-export default { findMany, findById, updateNotes, activate, deprecate, addLabel, updateLabel, promoteLabel, updateLabelAccessLevel, removeLabel, saveAudio, removeAudio, addBroader, removeBroader, addRelated, removeRelated, addSynonym, removeSynonym, removeSynonymFor, findAllActiveWithRelations, findIdByExactPrefLabel };
+export default { findMany, findById, updateNotes, activate, deprecate, addLabel, updateLabel, promoteLabel, updateLabelAccessLevel, removeLabel, saveAudio, removeAudio, addBroader, removeBroader, addRelated, removeRelated, addSynonym, removeSynonym, removeSynonymFor, findAllWithRelations, buildRelationGraph, findIdByExactPrefLabel };

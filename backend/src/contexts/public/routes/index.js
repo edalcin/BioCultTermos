@@ -2,6 +2,7 @@ import { Router } from 'express';
 import path from 'path';
 import { config } from '../../../config/index.js';
 import * as ConceptService from '../../../services/ConceptService.js';
+import { CONCEPT_STATUS } from '../../../models/Concept.js';
 
 const router = Router();
 
@@ -16,8 +17,18 @@ router.get('/', async (req, res, next) => {
 router.get('/browse', (req, res, next) => {
   try {
     const db = req.app.locals.db;
-    const terms = ConceptService.findAllActiveWithRelations(db);
+    const terms = ConceptService.findAllWithRelations(db, { status: CONCEPT_STATUS.ACTIVE });
     res.render('browse', { title: 'Navegar', currentPage: 'browse', terms });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/graph', (req, res, next) => {
+  try {
+    const db = req.app.locals.db;
+    const graph = ConceptService.buildRelationGraph(db, { status: CONCEPT_STATUS.ACTIVE });
+    res.render('graph', { title: 'Grafo', currentPage: 'graph', graph });
   } catch (err) {
     next(err);
   }

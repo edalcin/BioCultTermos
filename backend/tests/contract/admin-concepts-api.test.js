@@ -1113,4 +1113,33 @@ describe('Admin Concepts/Labels API', () => {
       expect(res.status).toBe(400);
     });
   });
+
+  // ---------------------------------------------------------------------------
+  // GET /graph
+  // ---------------------------------------------------------------------------
+
+  describe('GET /graph', () => {
+    it('returns 401 without credentials', async () => {
+      requireApp();
+      const res = await request(app).get('/graph');
+      expect(res.status).toBe(401);
+    });
+
+    it('includes candidate concepts so curators see the unpublished hierarchy', async () => {
+      requireApp();
+      const parent = buildConcept();
+      parent.prefLabels[0].literalForm = 'medicinal';
+      const child = buildConcept({ broader: [parent.id] });
+      child.prefLabels[0].literalForm = 'asma';
+      insertConceptRows([parent, child]);
+
+      const res = await request(app).get('/graph').set('Authorization', validAuth);
+
+      expect(res.status).toBe(200);
+      const payload = JSON.parse(res.text.match(/id="graph-data">([\s\S]*?)<\/script>/)[1]);
+      expect(payload.nodes.map((n) => n.label).sort()).toEqual(['asma', 'medicinal']);
+      expect(payload.edges[0]).toMatchObject({ source: parent.id, target: child.id, rel: 'broader' });
+      expect(res.text).toContain('href="/graph"');
+    });
+  });
 });

@@ -60,6 +60,16 @@ router.get('/relationships', async (req, res, next) => {
   }
 });
 
+router.get('/graph', async (req, res, next) => {
+  try {
+    const db = req.app.locals.db;
+    const graph = ConceptService.buildRelationGraph(db);
+    res.render('graph', { graph, user: req.user, currentPage: 'graph' });
+  } catch (err) {
+    next(err);
+  }
+});
+
 async function resolveVersion(db, id, bodyVersion) {
   const v = parseInt(bodyVersion, 10);
   if (!isNaN(v)) return v;

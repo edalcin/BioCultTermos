@@ -47,6 +47,7 @@ export function createApp(db) {
   app.use(express.urlencoded({ extended: true }));
   app.use(requestLogger);
 
+  app.use('/assets/shared', express.static(path.join(__dirname, '..', '..', 'shared', 'assets')));
   app.use('/assets', express.static(path.join(__dirname, 'views', 'assets')));
 
   app.locals.db = db;
