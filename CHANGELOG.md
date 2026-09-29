@@ -14,6 +14,16 @@ opcional, como diziam o ADR-007 F3 e o ADR-010.
 
 ---
 
+## 2026-09-29 — origem: BioCultDB (configuração, sem código)
+
+Os repositórios da federação mudaram da unidade `D:` para `S:`. A única referência de caminho de
+máquina dentro do código do módulo era uma entrada de permissão em `.claude/settings.local.json`;
+ela passa a apontar para `S:/git/etnotermos/.gitignore`.
+
+- `.claude/settings.local.json`: caminho `D:/git/...` substituído por `S:/git/...`.
+
+---
+
 ## 2026-08-16 — origem: BioCultDB (documentação, sem código)
 
 O manual passa a citar a **referência central dos rótulos SKOS-XL da arquitetura**

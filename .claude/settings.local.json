@@ -86,7 +86,7 @@
       "Bash(git merge *)",
       "Bash(git stash *)",
       "Bash(echo \"exit: $?\")",
-      "Bash(grep -n \"docker/.env\\\\|docker\\\\\\\\.env\" D:/git/etnotermos/.gitignore)",
+      "Bash(grep -n \"docker/.env\\\\|docker\\\\\\\\.env\" S:/git/etnotermos/.gitignore)",
       "mcp__plugin_mongodb_mongodb__list-databases",
       "mcp__plugin_mongodb_mongodb__connect",
       "mcp__plugin_mongodb_mongodb__find",
