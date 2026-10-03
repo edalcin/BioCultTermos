@@ -140,7 +140,7 @@ Toda versão publicada aqui **deve** ser adotada por todas as quatro unidades (A
 assíncrona). Consequência direta: **todo commit precisa ser seguro para todas as unidades** — nenhum
 comportamento específico de uma unidade pode entrar neste código (ADR-007 F5, ADR-012 G5).
 
-Decisão: `Arquitetura-BioCultural/docs/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md`
+Decisão: `Arquitetura-BioCultural/docs/tecnico/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md`
 
 
 ## Recent Changes
@@ -164,7 +164,7 @@ Rules:
 
 ## Arquitetura v3.1 — Persistência
 Persistência = SQLite com JSON (JSON1), **um arquivo por unidade federada** compartilhado pelas ferramentas (tabelas distintas), WAL, `SQLITE_DB_PATH`. Um container por unidade. Sem dependência de banco de dados de documentos externo.
-Ref.: Arquitetura-BioCultural/docs/architecture-decisions/ADR-005.
+Ref.: Arquitetura-BioCultural/docs/tecnico/architecture-decisions/ADR-005.
 
 ## Agent skills
 

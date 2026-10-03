@@ -7,8 +7,8 @@ compartilhado — para que qualquer unidade (inclusive as que ainda não têm c�
 precisar ler `git log` diretamente.
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/). Toda entrada nova segue
-o fluxo obrigatório do [ADR-010](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-010-central-documentation-and-build-verification.md)
-(push + esta documentação são obrigatórios) e o [ADR-012](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md),
+o fluxo obrigatório do [ADR-010](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-010-central-documentation-and-build-verification.md)
+(push + esta documentação são obrigatórios) e o [ADR-012](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md),
 que tornou o bump do submodule nas demais unidades **obrigatório e assíncrono** (G4) — não mais
 opcional, como diziam o ADR-007 F3 e o ADR-010.
 
@@ -27,7 +27,7 @@ ela passa a apontar para `S:/git/etnotermos/.gitignore`.
 ## 2026-08-16 — origem: BioCultDB (documentação, sem código)
 
 O manual passa a citar a **referência central dos rótulos SKOS-XL da arquitetura**
-([`Arquitetura-BioCultural/docs/rotulos-skos-xl.md`](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/rotulos-skos-xl.md)),
+([`Arquitetura-BioCultural/docs/tecnico/rotulos-skos-xl.md`](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/rotulos-skos-xl.md)),
 documento normativo que consolida tipos de rótulo, metadados, regras e exemplos das curadorias
 reais — divergência entre manual e referência resolve-se lá.
 
@@ -133,7 +133,7 @@ são BioCultRelatos, BioCultNaturalistas e BioCultAcervos, que nascem sem CSS de
 **Commit**: `726fd56`
 
 Sem mudança de código. Documentação do módulo alinhada ao
-[ADR-012](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md),
+[ADR-012](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md),
 que fecha três lacunas do ADR-007/ADR-010 expostas por um sintoma real: um clone standalone deste
 repositório sobrevivendo fora de qualquer unidade hospedeira, sete commits atrás deste remoto, com
 trabalho não publicado preso dentro dele (duas stashes e uma seção de `CLAUDE.md`).

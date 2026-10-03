@@ -39,7 +39,7 @@
 > [Princípios CARE](https://www.gida-global.org/care) ·
 > [Darwin Core (TDWG)](https://dwc.tdwg.org/) ·
 > [Protocolo de Nagoya](https://www.cbd.int/abs/) ·
-> [Rótulos SKOS-XL da Arquitetura BioCultural — Referência Central](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/rotulos-skos-xl.md)
+> [Rótulos SKOS-XL da Arquitetura BioCultural — Referência Central](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/rotulos-skos-xl.md)
 >
 > Este manual documenta o comportamento atual da tela de edição do BioCultTermos. As caixas de
 > ajuda (**?**) dentro do sistema trazem versões resumidas destes mesmos conceitos. O registro

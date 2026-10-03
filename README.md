@@ -20,10 +20,10 @@
 > ### Este repositório não se clona.
 >
 > Ele é o lugar onde o código **reside**, não um lugar onde se **trabalha**. Desde o
-> [ADR-007 F2](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-007-shared-bioculttermos-module.md)
+> [ADR-007 F2](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-007-shared-bioculttermos-module.md)
 > não há Docker próprio: um clone isolado **não roda, não testa, e a única coisa que faz de forma
 > confiável é envelhecer** até divergir. Clonar isoladamente é proibido pelo
-> [ADR-012 G2](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md).
+> [ADR-012 G2](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md).
 
 Não é regra de estilo. Em agosto de 2026 um clone assim sobreviveu sete commits atrás deste remoto,
 com trabalho não publicado preso dentro dele; a regra existe por causa dele.
@@ -55,12 +55,12 @@ git -C <hospedeiro> push
 O `--ff-only` é deliberado: se aquela Cópia de Trabalho tiver commits locais esquecidos, ele falha em
 voz alta em vez de fabricar um merge silencioso. O `push` só publica os dois de uma vez com
 `push.recurseSubmodules=on-demand` ligado — parte da configuração obrigatória
-([ADR-012 G3](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md)).
+([ADR-012 G3](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md)).
 
 ### O que acontece depois do push
 
 Toda versão publicada aqui **deve** ser adotada pelas quatro unidades — obrigatória e
-assincronamente ([ADR-012 G4](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md)).
+assincronamente ([ADR-012 G4](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md)).
 Cada unidade escolhe *quando*, não *se*. Ficar para trás é um estado medido e temporário, não uma
 decisão: `Arquitetura-BioCultural/bin/termos-status.ps1` reporta o atraso das quatro.
 
@@ -68,8 +68,8 @@ decisão: `Arquitetura-BioCultural/bin/termos-status.ps1` reporta o atraso das q
 
 > Se toda unidade adota tudo, então **todo commit precisa ser seguro para todas as unidades**.
 > Nenhum comportamento específico de uma unidade entra neste código — generalize antes, ou não entre
-> ([ADR-007 F5](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-007-shared-bioculttermos-module.md),
-> [ADR-012 G5](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md)).
+> ([ADR-007 F5](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-007-shared-bioculttermos-module.md),
+> [ADR-012 G5](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md)).
 
 E a fronteira que nunca se atravessa: **código propaga sempre, conteúdo nunca.** Termos, rótulos,
 definições e relações curadas pertencem ao SQLite da unidade que os curou e não saem de lá.
@@ -85,9 +85,9 @@ A segunda é recente e **não é óbvia**: editar aqui a paleta ou o `.btn` muda
 unidades federadas, não só do vocabulário. Ela vive aqui porque as quatro unidades já carregam este
 módulo, o que evita um segundo repositório compartilhado para cerca de 40 linhas de tokens —
 desvio de responsabilidade assumido, com caminho de saída documentado no cabeçalho do preset e em
-[ADR-013](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-013-identidade-visual-compartilhada.md).
+[ADR-013](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-013-identidade-visual-compartilhada.md).
 
-**Fluxo completo e solução de problemas**: [`docs/gestaoBioCultTermos/fluxo-de-trabalho.md`](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/gestaoBioCultTermos/fluxo-de-trabalho.md)
+**Fluxo completo e solução de problemas**: [`docs/gestaoBioCultTermos/fluxo-de-trabalho.md`](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/gestaoBioCultTermos/fluxo-de-trabalho.md)
 na Arquitetura BioCultural.
 
 ---
@@ -200,13 +200,13 @@ mesmo repositório compartilhado, e então adotadas pelas demais unidades via bu
 submodule. Ver [Modo de operação](#modo-de-operação--leia-antes-de-tocar-no-código) acima.
 
 **A adoção é obrigatória e assíncrona**, não opcional: cada unidade escolhe quando, não se
-([ADR-012 G4](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md),
+([ADR-012 G4](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md),
 que supersede o ADR-007 F3 e o ADR-010 nesse ponto — os dois declaravam o bump entre unidades
 opcional). O atraso de cada unidade é medido por `Arquitetura-BioCultural/bin/termos-status.ps1`.
 
 **Toda mudança de código feita através de qualquer unidade hospedeira é documentada em
 [`CHANGELOG.md`](CHANGELOG.md)** deste repositório — ver
-[ADR-010](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-010-central-documentation-and-build-verification.md)
+[ADR-010](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-010-central-documentation-and-build-verification.md)
 da Arquitetura BioCultural.
 
 **Este repositório está congelado como produto standalone** desde a integração com o BioCultDB
@@ -227,7 +227,7 @@ dois casos.
 **Soberania é de dados, não de código.** O módulo BioCultTermos é intencionalmente o mesmo código em
 todas as unidades — o que cada unidade mantém soberano é seu próprio arquivo SQLite (`ConceptScheme`
 próprio, dados nunca compartilhados entre unidades). Decisão arquitetural completa em
-[ADR-007](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-007-shared-bioculttermos-module.md).
+[ADR-007](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-007-shared-bioculttermos-module.md).
 
 **Bloqueio de código pendente — pré-requisito para três das quatro unidades.** O `AcquisitionService`
 (`backend/src/services/AcquisitionService.js`) não é apenas "tabela hardcoded": `collectFieldValues`
@@ -236,7 +236,7 @@ próprio, dados nunca compartilhados entre unidades). Decisão arquitetural comp
 cada unidade — uma **Comunidade Tradicional** (Decreto 8.750/2016, com CLPI e CARE) não é a mesma
 coisa que um naturalista do século XVIII ou uma coleção. A generalização decidida é a **Fonte de
 Atribuição** `{tipo, nome}`: estrutura única, tipo declarado pela unidade e gravado no dado, nunca
-achatado ([ADR-012 G5](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md)).
+achatado ([ADR-012 G5](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md)).
 Ainda não implementado.
 
 ## Integração de Referência — BioCultDB (produção)
@@ -589,7 +589,7 @@ O **Pluriverso** mantém uma camada de mapeamentos semânticos (`skos:exactMatch
 | **[BioCultAcervos](https://github.com/edalcin/BioCultAcervos)** | Cada acervo histórico/museológico membro opera sua própria instância do BioCultTermos integrada ao seu BioCultAcervos |
 | **[BioCultNaturalistas](https://github.com/edalcin/BioCultNaturalistas)** | Cada membro de Obras de Naturalistas opera sua própria instância do BioCultTermos integrada ao seu BioCultNaturalistas |
 | **[Pluriverso](https://github.com/edalcin/pluriverso)** | Coleta ConceptSchemes públicos e mantém mapeamentos SKOS entre membros |
-| **[Arquitetura BioCultural](https://github.com/edalcin/Arquitetura-BioCultural)** | Documentação completa ([ADR-004](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-004-federated-architecture.md) — federação; [ADR-007](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/architecture-decisions/ADR-007-shared-bioculttermos-module.md) — módulo compartilhado via submodule) |
+| **[Arquitetura BioCultural](https://github.com/edalcin/Arquitetura-BioCultural)** | Documentação completa ([ADR-004](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-004-federated-architecture.md) — federação; [ADR-007](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-007-shared-bioculttermos-module.md) — módulo compartilhado via submodule) |
 
 ---
 

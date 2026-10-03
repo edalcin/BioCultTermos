@@ -10,7 +10,7 @@ informações tão importantes quanto o nome em si.
 > **Referência normativa da arquitetura:** este capítulo é o guia didático. A relação completa dos
 > rótulos SKOS-XL que a arquitetura federada suporta — tipos, metadados, regras consolidadas e
 > exemplos das curadorias reais — está centralizada em
-> [Rótulos SKOS-XL da Arquitetura BioCultural](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/rotulos-skos-xl.md).
+> [Rótulos SKOS-XL da Arquitetura BioCultural](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/rotulos-skos-xl.md).
 > Divergência entre os dois resolve-se lá.
 
 ### 3.1 Os três tipos de rótulo {#s3-1}
