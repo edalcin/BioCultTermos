@@ -537,25 +537,31 @@ graph TD
     subgraph I1["Iniciativa de Fontes Secundárias"]
         ET1(BioCultTermos\nConceptScheme: I1) <--> SDB1[(SQLite I1)]
     end
-    subgraph C2["Comunidade Tradicional"]
+    subgraph C2["Comunidade Tradicional (proposta)"]
         ET2(BioCultTermos\nConceptScheme: C2) <--> SDB2[(SQLite C2)]
     end
-    subgraph AC["Acervos Históricos e Museológicos"]
+    subgraph AC["Acervos Históricos e Museológicos (proposta)"]
         ET3(BioCultTermos\nConceptScheme: AC) <--> SDB3[(SQLite AC)]
     end
-    subgraph NA["Obras de Naturalistas séc. XVII-XIX"]
+    subgraph NA["Obras de Naturalistas séc. XVII-XIX (proposta)"]
         ET4(BioCultTermos\nConceptScheme: NA) <--> SDB4[(SQLite NA)]
     end
-    subgraph PL["Pluriverso"]
+    subgraph PL["Pluriverso (proposta)"]
         MAP["Mapeamentos SKOS-XL\nskos:exactMatch\nskos:closeMatch\nskos:broadMatch"]
     end
-    ET1 -->|"harvest REST\n(ConceptScheme público)"| MAP
-    ET2 -->|"harvest REST\n(ConceptScheme público)"| MAP
-    ET3 -->|"harvest REST\n(ConceptScheme público)"| MAP
-    ET4 -->|"harvest REST\n(ConceptScheme público)"| MAP
+    ET1 -.->|"harvest REST\n(ConceptScheme público)"| MAP
+    ET2 -.-> MAP
+    ET3 -.-> MAP
+    ET4 -.-> MAP
+    style C2 stroke-dasharray: 5 5
+    style AC stroke-dasharray: 5 5
+    style NA stroke-dasharray: 5 5
+    style PL stroke-dasharray: 5 5
 ```
 
-O **Pluriverso** mantém uma camada de mapeamentos semânticos (`skos:exactMatch`, `skos:closeMatch`, `skos:broadMatch`) entre os `ConceptScheme` de diferentes membros. Isso permite que uma busca semântica federada encontre registros independentemente de qual termo cada membro usa para o mesmo conceito.
+> Linhas tracejadas = **proposta, sem implementação** ([ADR-021](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-021-escopo-de-implementacao.md)). Só a Iniciativa de Fontes Secundárias (BioCultDB + BioCultTermos) está implementada; o desenho mostra como a arquitetura poderia ser implementada no futuro.
+
+O **Pluriverso** (proposta, sem implementação) manteria uma camada de mapeamentos semânticos (`skos:exactMatch`, `skos:closeMatch`, `skos:broadMatch`) entre os `ConceptScheme` de diferentes membros. Isso permitiria que uma busca semântica federada encontre registros independentemente de qual termo cada membro usa para o mesmo conceito.
 
 ### Soberania dos Vocabulários
 
