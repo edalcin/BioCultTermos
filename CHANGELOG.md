@@ -14,6 +14,17 @@ opcional, como diziam o ADR-007 F3 e o ADR-010.
 
 ---
 
+## 2026-11-01 — origem: BioCultDB (documentação, sem código)
+
+Escopo de implementação decidido (ADR-021 da arquitetura): BioCultDB + BioCultTermos é o único caso
+implementado. BioCultRelatos, BioCultAcervos e BioCultNaturalistas passam a ser propostas, sem
+implementação, e não hospedam o módulo.
+
+- `README.md`, `CLAUDE.md`: unidades hospedeiras reduzidas ao BioCultDB; tabela de status e nota sobre o
+  `AcquisitionService` reescritas.
+
+---
+
 ## 2026-09-29 — origem: BioCultDB (configuração, sem código)
 
 Os repositórios da federação mudaram da unidade `D:` para `S:`. A única referência de caminho de

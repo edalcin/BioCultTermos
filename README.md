@@ -5,7 +5,7 @@
   <img src="manual/img/BioCultTermosLogo.png" alt="BioCultTermos Logo" width="200">
 </div>
 
-**BioCultTermos v2.0** é o **módulo de vocabulário controlado etnobotânico** da [Arquitetura BioCultural](https://github.com/edalcin/Arquitetura-BioCultural), embutido via **git submodule** em cada unidade federada (BioCultDB, BioCultRelatos, BioCultAcervos, BioCultNaturalistas), operando sob o padrão **SKOS-XL** (Simple Knowledge Organization System — eXtension for Labels).
+**BioCultTermos v2.0** é o **módulo de vocabulário controlado etnobotânico** da [Arquitetura BioCultural](https://github.com/edalcin/Arquitetura-BioCultural), embutido via **git submodule** na unidade federada que o hospeda — hoje apenas o BioCultDB, único caso implementado ([ADR-021](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-021-escopo-de-implementacao.md)) —, operando sob o padrão **SKOS-XL** (Simple Knowledge Organization System — eXtension for Labels).
 
 > **Padrão**: [W3C SKOS-XL](https://www.w3.org/TR/skos-reference/skos-xl.html) · [Especificação SKOS completa](docs/simple_knowledge_organization_system_skos.pdf)
 
@@ -30,12 +30,9 @@ com trabalho não publicado preso dentro dele; a regra existe por causa dele.
 
 ### Onde se edita
 
-Dentro da **Cópia de Trabalho** de uma Unidade Hospedeira — `bioculttermos/` dentro de
-[BioCultDB](https://github.com/edalcin/BioCultDB), [BioCultRelatos](https://github.com/edalcin/BioCultRelatos),
-[BioCultNaturalistas](https://github.com/edalcin/BioCultNaturalistas) ou
-[BioCultAcervos](https://github.com/edalcin/BioCultAcervos) — especificamente **na unidade que motivou
-a mudança**, porque é lá que ela pode ser executada contra o banco real antes de ser publicada.
-Mudança transversal, sem dono claro: use o BioCultDB, a única unidade em produção.
+Dentro da **Cópia de Trabalho** da Unidade Hospedeira — `bioculttermos/` dentro de
+[BioCultDB](https://github.com/edalcin/BioCultDB), a única que o hospeda e o executa contra o banco
+real antes de ser publicado ([ADR-021](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-021-escopo-de-implementacao.md)).
 
 Nenhuma unidade é canônica. Não há hierarquia entre unidades federadas.
 
@@ -59,10 +56,10 @@ voz alta em vez de fabricar um merge silencioso. O `push` só publica os dois de
 
 ### O que acontece depois do push
 
-Toda versão publicada aqui **deve** ser adotada pelas quatro unidades — obrigatória e
+Toda versão publicada aqui **deve** ser adotada pelas unidades hospedeiras — hoje só o BioCultDB — obrigatória e
 assincronamente ([ADR-012 G4](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md)).
 Cada unidade escolhe *quando*, não *se*. Ficar para trás é um estado medido e temporário, não uma
-decisão: `Arquitetura-BioCultural/bin/termos-status.ps1` reporta o atraso das quatro.
+decisão: `Arquitetura-BioCultural/bin/termos-status.ps1` reporta o atraso das unidades hospedeiras.
 
 **A consequência disso é a regra mais importante deste repositório:**
 
@@ -82,7 +79,7 @@ definições e relações curadas pertencem ao SQLite da unidade que os curou e 
 | **Identidade visual da arquitetura** | `tailwind.preset.cjs` e `frontend/src/styles/biocult-base.css` — paleta `forest`, `@layer base`, `@layer components` | `presets: [...]` e `@import` no build de CSS da unidade |
 
 A segunda é recente e **não é óbvia**: editar aqui a paleta ou o `.btn` muda a aparência de todas as
-unidades federadas, não só do vocabulário. Ela vive aqui porque as quatro unidades já carregam este
+unidades federadas, não só do vocabulário. Ela vive aqui porque as unidades hospedeiras já carregam este
 módulo, o que evita um segundo repositório compartilhado para cerca de 40 linhas de tokens —
 desvio de responsabilidade assumido, com caminho de saída documentado no cabeçalho do preset e em
 [ADR-013](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-013-identidade-visual-compartilhada.md).
@@ -96,7 +93,7 @@ na Arquitetura BioCultural.
 
 O conhecimento das comunidades tradicionais do Brasil expressa relações profundas entre povos, línguas e entidades biológicas. Preservar esse conhecimento de forma legítima exige uma arquitetura de informação que não seja colonizadora — que trate os termos das línguas indígenas como protagonistas, não como apêndices subordinados à nomenclatura científica ocidental.
 
-O BioCultTermos nasce desta necessidade: gerenciar os termos que a ferramenta principal de cada unidade federada acumula (literatura científica no caso do BioCultDB; registro primário no BioCultRelatos; acervos e obras históricas em BioCultAcervos/BioCultNaturalistas), submetendo-os a um processo estruturado de curadoria segundo o padrão SKOS-XL, com governança de dados alinhada aos Princípios CARE.
+O BioCultTermos nasce desta necessidade: gerenciar os termos que a ferramenta principal de cada unidade federada acumula (literatura científica no caso do BioCultDB, o caso implementado; BioCultRelatos, BioCultAcervos e BioCultNaturalistas são propostas, sem implementação), submetendo-os a um processo estruturado de curadoria segundo o padrão SKOS-XL, com governança de dados alinhada aos Princípios CARE.
 
 ---
 
@@ -213,31 +210,29 @@ da Arquitetura BioCultural.
 (julho de 2026, ADR-007 F2): o diretório `docker/` foi removido, não existe imagem própria, e ele
 não recebe roadmap próprio. Toda evolução acontece através das unidades hospedeiras.
 
-| Unidade hospedeira | Ferramenta principal | Cópia de Trabalho | Status da integração |
-|---|---|---|---|
-| Iniciativa de Fontes Secundárias | [BioCultDB](https://github.com/edalcin/BioCultDB) | sim | **Implementado, em produção** desde 2026-07-13 — `BioCultDB/integracao.md`, `BioCultDB/docs/decisions/ADR-001-integracao-bioculttermos.md` |
-| Comunidade Tradicional | [BioCultRelatos](https://github.com/edalcin/BioCultRelatos) | sim, desde 2026-08-09 | Submodule no lugar e home page inicial; sem `Dockerfile.unidade` ainda, portanto sem como exercitar o módulo — `BioCultRelatos/integracao.md` |
-| Acervos Históricos e Museológicos | [BioCultAcervos](https://github.com/edalcin/BioCultAcervos) | sim, desde 2026-08-09 | Submodule no lugar e home page inicial; contextos ainda não definidos — `BioCultAcervos/integracao.md` |
-| Obras de Naturalistas (séc. XVII–XIX) | [BioCultNaturalistas](https://github.com/edalcin/BioCultNaturalistas) | sim, desde 2026-08-09 | Submodule no lugar e home page inicial; portas já decididas (3001 Registro, 3003 Apresentação, sem Curadoria) — `BioCultNaturalistas/integracao.md` |
+| Unidade | Ferramenta principal | Status |
+|---|---|---|
+| Iniciativa de Fontes Secundárias | [BioCultDB](https://github.com/edalcin/BioCultDB) | BioCultTermos **em produção, integrado ao BioCultDB** (desde 2026-07-13) — único caso implementado, ligado ao projeto GEF/MCTI "Entre-Ciências" (entregas do USEFLORA e do JBRJ) — `BioCultDB/integracao.md`, `BioCultDB/docs/decisions/ADR-001-integracao-bioculttermos.md` |
+| Comunidade Tradicional | [BioCultRelatos](https://github.com/edalcin/BioCultRelatos) | **Proposta, sem implementação** — não hospeda o módulo |
+| Acervos Históricos e Museológicos | [BioCultAcervos](https://github.com/edalcin/BioCultAcervos) | **Proposta, sem implementação** — não hospeda o módulo |
+| Obras de Naturalistas (séc. XVII–XIX) | [BioCultNaturalistas](https://github.com/edalcin/BioCultNaturalistas) | **Proposta, sem implementação** — não hospeda o módulo |
 
-Enquanto uma unidade não tiver `docker/Dockerfile.unidade`, ela não consegue buildar nem executar o
-módulo: para ela o bump é **escrituração**, não adoção verificada. O leitor de estado distingue os
-dois casos.
+Escopo decidido em [ADR-021](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-021-escopo-de-implementacao.md): BioCultDB + BioCultTermos é o único caso implementado da
+arquitetura; as demais unidades são propostas de como ela poderia ser implementada no futuro, sem
+stack definida.
 
 **Soberania é de dados, não de código.** O módulo BioCultTermos é intencionalmente o mesmo código em
 todas as unidades — o que cada unidade mantém soberano é seu próprio arquivo SQLite (`ConceptScheme`
 próprio, dados nunca compartilhados entre unidades). Decisão arquitetural completa em
 [ADR-007](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-007-shared-bioculttermos-module.md).
 
-**Bloqueio de código pendente — pré-requisito para três das quatro unidades.** O `AcquisitionService`
-(`backend/src/services/AcquisitionService.js`) não é apenas "tabela hardcoded": `collectFieldValues`
-é uma travessia escrita à mão da forma documental do BioCultDB, e usa `comunidades[].nome` como a
-**dimensão de atribuição** de cada termo minerado. Generalizar exige decidir o que é procedência em
-cada unidade — uma **Comunidade Tradicional** (Decreto 8.750/2016, com CLPI e CARE) não é a mesma
-coisa que um naturalista do século XVIII ou uma coleção. A generalização decidida é a **Fonte de
-Atribuição** `{tipo, nome}`: estrutura única, tipo declarado pela unidade e gravado no dado, nunca
-achatado ([ADR-012 G5](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md)).
-Ainda não implementado.
+**Generalização do `AcquisitionService` — só se uma proposta virar implementação.** O `AcquisitionService`
+(`backend/src/services/AcquisitionService.js`) é específico do BioCultDB: `collectFieldValues` é uma
+travessia escrita à mão da forma documental do BioCultDB e usa `comunidades[].nome` como a
+**dimensão de atribuição** de cada termo minerado. Como só o BioCultDB implementa a arquitetura
+([ADR-021](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-021-escopo-de-implementacao.md)), isso não bloqueia nada hoje. Se quem assumir outra unidade a implementar,
+a generalização decidida é a **Fonte de Atribuição** `{tipo, nome}`
+([ADR-012 G5](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-012-manutencao-codigo-bioculttermos.md)). Não implementado.
 
 ## Integração de Referência — BioCultDB (produção)
 
@@ -527,7 +522,7 @@ O BioCultTermos implementa os Princípios CARE para dados de povos indígenas:
 - [Darwin Core](https://dwc.tdwg.org/) — Interoperabilidade com biodiversidade
 - [Protocolo de Nagoya](https://www.cbd.int/abs/) — Repartição de benefícios
 - [Arquitetura BioCultural](https://github.com/edalcin/Arquitetura-BioCultural) — Ecossistema integrado
-- [BioCultDB](https://github.com/edalcin/BioCultDB) · [BioCultRelatos](https://github.com/edalcin/BioCultRelatos) · [BioCultAcervos](https://github.com/edalcin/BioCultAcervos) · [BioCultNaturalistas](https://github.com/edalcin/BioCultNaturalistas) — unidades hospedeiras (ferramentas principais que embutem este módulo)
+- [BioCultDB](https://github.com/edalcin/BioCultDB) — unidade hospedeira (única que embute este módulo). [BioCultRelatos](https://github.com/edalcin/BioCultRelatos) · [BioCultAcervos](https://github.com/edalcin/BioCultAcervos) · [BioCultNaturalistas](https://github.com/edalcin/BioCultNaturalistas) — propostas, sem implementação
 
 ## Arquitetura BioCultural Federada — v3.2
 
@@ -584,10 +579,10 @@ O **Pluriverso** mantém uma camada de mapeamentos semânticos (`skos:exactMatch
 
 | Componente | Relação |
 |------------|---------|
-| **[BioCultDB](https://github.com/edalcin/BioCultDB)** | Unidade hospedeira em produção; embute o BioCultTermos via git submodule como sua infraestrutura terminológica soberana |
-| **[BioCultRelatos](https://github.com/edalcin/BioCultRelatos)** | Cada Comunidade Tradicional opera sua própria instância do BioCultTermos integrada ao seu BioCultRelatos |
-| **[BioCultAcervos](https://github.com/edalcin/BioCultAcervos)** | Cada acervo histórico/museológico membro opera sua própria instância do BioCultTermos integrada ao seu BioCultAcervos |
-| **[BioCultNaturalistas](https://github.com/edalcin/BioCultNaturalistas)** | Cada membro de Obras de Naturalistas opera sua própria instância do BioCultTermos integrada ao seu BioCultNaturalistas |
+| **[BioCultDB](https://github.com/edalcin/BioCultDB)** | Em produção (caso implementado); embute o BioCultTermos via git submodule como sua infraestrutura terminológica soberana |
+| **[BioCultRelatos](https://github.com/edalcin/BioCultRelatos)** | Proposta, sem implementação — não hospeda o BioCultTermos |
+| **[BioCultAcervos](https://github.com/edalcin/BioCultAcervos)** | Proposta, sem implementação — não hospeda o BioCultTermos |
+| **[BioCultNaturalistas](https://github.com/edalcin/BioCultNaturalistas)** | Proposta, sem implementação — não hospeda o BioCultTermos |
 | **[Pluriverso](https://github.com/edalcin/pluriverso)** | Coleta ConceptSchemes públicos e mantém mapeamentos SKOS entre membros |
 | **[Arquitetura BioCultural](https://github.com/edalcin/Arquitetura-BioCultural)** | Documentação completa ([ADR-004](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-004-federated-architecture.md) — federação; [ADR-007](https://github.com/edalcin/Arquitetura-BioCultural/blob/main/docs/tecnico/architecture-decisions/ADR-007-shared-bioculttermos-module.md) — módulo compartilhado via submodule) |
 

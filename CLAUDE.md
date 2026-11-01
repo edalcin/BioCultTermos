@@ -131,12 +131,12 @@ próprio, não há como executá-lo nem testá-lo fora de uma Unidade Hospedeira
 **Clonar este repositório isoladamente é proibido pelo ADR-012 G2.** Um clone standalone não roda, não
 testa, e a única coisa que faz de forma confiável é envelhecer até divergir.
 
-Toda edição acontece dentro da Cópia de Trabalho de uma Unidade Hospedeira — `BioCultDB/bioculttermos/`,
-`BioCultRelatos/bioculttermos/`, `BioCultNaturalistas/bioculttermos/` ou `BioCultAcervos/bioculttermos/` —
-especificamente na unidade que motivou a mudança, porque é lá que ela pode ser executada contra o SQLite
-real antes de ser publicada.
+Toda edição acontece dentro da Cópia de Trabalho de uma Unidade Hospedeira — `BioCultDB/bioculttermos/`
+(única unidade hospedeira; BioCultRelatos, BioCultAcervos e BioCultNaturalistas são propostas, sem
+implementação — ADR-021 da arquitetura), porque é lá que ela pode ser executada contra o SQLite real
+antes de ser publicada.
 
-Toda versão publicada aqui **deve** ser adotada por todas as quatro unidades (ADR-012 G4, obrigatória e
+Toda versão publicada aqui **deve** ser adotada pelas unidades hospedeiras (hoje só o BioCultDB) (ADR-012 G4, obrigatória e
 assíncrona). Consequência direta: **todo commit precisa ser seguro para todas as unidades** — nenhum
 comportamento específico de uma unidade pode entrar neste código (ADR-007 F5, ADR-012 G5).
 
